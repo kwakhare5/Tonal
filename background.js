@@ -26,8 +26,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   })
     .then(async res => {
       if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`Worker Error (${res.status}): ${errText.slice(0, 50)}`);
+        if (res.status === 400) throw new Error("NO_TEXT");
+        if (res.status === 429) throw new Error("RATE_LIMIT");
+        if (res.status === 502 || res.status === 503) throw new Error("AI_BUSY");
+        throw new Error("SERVER_ERROR");
       }
       return res.json();
     })
@@ -35,12 +37,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (data.success) {
         sendResponse({ success: true,  text: data.text });
       } else {
-        sendResponse({ success: false, error: data.error || "AI Generation failed" });
+        sendResponse({ success: false, error: data.error === "No text provided" ? "NO_TEXT" : "AI_FAILED" });
       }
     })
     .catch(err => {
       console.error("Tonal Fetch Error:", err);
-      sendResponse({ success: false, error: err.message || "Connection failed" });
+      const msg = err.message === "Failed to fetch" ? "NETWORK_ERROR" : (err.message || "SERVER_ERROR");
+      sendResponse({ success: false, error: msg });
     });
 
   return true; // keeps the async channel open — DO NOT REMOVE

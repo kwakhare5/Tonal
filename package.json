@@ -4,6 +4,6 @@
   "description": "The two-way tone translator for the modern web.",
   "scripts": {
     "kill": "npx kill-port 3000 3001 3002 8080",
-    "save": "git add -A && git commit -m \"checkpoint: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')\" && git push"
+    "save": "git add -A && git commit -m 'checkpoint: [timestamp]' && git push"
   }
 }

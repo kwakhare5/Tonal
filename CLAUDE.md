@@ -76,7 +76,7 @@ User receives a long formal/corporate message and can't be bothered to parse it.
 
 **The tone slider has 3 levels:**
 
-- **Texting** — Very casual, like texting a friend. Lowercase, short, no punctuation overthinking.
+- **Texting** — Very casual, like texting a friend. No overthinking.
 - **Work Chat** — Casual professional. How a normal person talks to a colleague they like.
 - **Corporate** — Formal, complete sentences, professional vocabulary. For boss emails, clients, HR.
 

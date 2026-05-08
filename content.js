@@ -46,7 +46,8 @@
     const btn = makeButton();
     wrap.appendChild(btn);
     
-    document.body.appendChild(wrap);
+    // Append to documentElement (<html>) to bypass all container clipping
+    document.documentElement.appendChild(wrap);
     positionPill(btn, input, platform);
 
     // Reposition on window resize
@@ -77,6 +78,11 @@
         </svg>
       </span>
       <span class="pill-text"></span>
+      <span class="pill-caret">
+        <svg width="8" height="5" viewBox="0 0 8 5" fill="none">
+          <path d="M1.5 1.5L4 3.5L6.5 1.5" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
     `;
 
     btn.addEventListener("mouseenter", () => {
@@ -86,9 +92,17 @@
       }
     });
 
-    btn.addEventListener("mouseleave", () => {
+    btn.addEventListener("mouseleave", (e) => {
       if (btn.dataset.state === "idle") {
-        btn.classList.replace("t-pill--expanded", "t-pill--rest");
+        // Delay collapse to see if we move into the popover
+        setTimeout(() => {
+          const isOverPopover = document.querySelector(".popover:hover");
+          const isOverPill = btn.matches(":hover");
+          if (!isOverPopover && !isOverPill) {
+            btn.classList.replace("t-pill--expanded", "t-pill--rest");
+            closePopover();
+          }
+        }, 100);
       }
     });
 
@@ -106,6 +120,13 @@
       }
     });
 
+    const caret = btn.querySelector('.pill-caret');
+    caret.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      showPopover(btn);
+    });
+
     btn.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -120,47 +141,94 @@
     const text = getInputText(input);
     const label = btn.querySelector(".pill-text");
     if (label) {
-      // Logic: Always set text, CSS (opacity/max-width) handles visibility for --rest state
-      const newLabel = (text && text.length > 0) ? "Convert" : "Tonal";
+      const names = { texting: "Casual", corporate: "Formal", workChat: "Work Chat" };
+      const toneName = names[btn.dataset.tone] || "Work Chat";
+      
+      // If text is present, we show the action "Convert". 
+      // If empty, we show the active "Tone Name".
+      const newLabel = (text && text.length > 0) ? "Convert" : toneName;
+      
       if (label.textContent !== newLabel) label.textContent = newLabel;
     }
   }
 
-  function positionPill(btn, input, platform) {
+  function positionPill(btn, input, isFirstLoad = false) {
     const wrap = btn.closest(".t-wrap");
     const rect = input.getBoundingClientRect();
     
-    wrap.style.top = `${rect.top + window.scrollY}px`;
-    wrap.style.left = `${rect.left + window.scrollX}px`;
-    wrap.style.width = `${rect.width}px`;
-    wrap.style.height = `${rect.height}px`;
+    const isVisible = rect.width > 0 && rect.height > 0;
+    if (!isVisible) {
+      wrap.style.display = "none";
+      return;
+    }
     
-    // Pill is always absolute right-middle
+    wrap.style.display = "block";
+    const targetY = rect.top + (rect.height / 2);
+    const targetX = rect.left + rect.width;
+
+    // Magnetic Smoothing (Lerp)
+    if (isFirstLoad || !wrap._lastX) {
+      wrap._lastX = targetX;
+      wrap._lastY = targetY;
+    } else {
+      // 0.15 factor gives it a "magnetic spring" feel
+      wrap._lastX += (targetX - wrap._lastX) * 0.15;
+      wrap._lastY += (targetY - wrap._lastY) * 0.15;
+    }
+
+    wrap.style.top = `${wrap._lastY}px`;
+    wrap.style.left = `${wrap._lastX}px`;
+    wrap.style.width = "0px";
+    wrap.style.height = "0px";
+    
     btn.style.position = "absolute";
-    btn.style.right = "8px";
-    btn.style.top = "50%";
+    btn.style.right = "8px"; 
+    btn.style.top = "0";
     btn.style.transform = "translateY(-50%)";
   }
 
+  function watchdog() {
+    const wraps = document.querySelectorAll(".t-wrap");
+    wraps.forEach(wrap => {
+      const input = wrap._tInput;
+      const btn = wrap.querySelector(".t-pill");
+      
+      // 1. Is the textbox dead or removed?
+      if (!input || !document.contains(input)) {
+        wrap.remove();
+        return;
+      }
+
+      // 2. Sync position (handles scrolling and dynamic layout shifts)
+      positionPill(btn, input, false); 
+    });
+    requestAnimationFrame(watchdog);
+  }
+
   function showPopover(btn) {
+    if (btn.classList.contains("t-pill--popover-open")) {
+      closePopover();
+      return;
+    }
     closePopover();
+    btn.classList.add("t-pill--popover-open");
     const input = btn.closest(".t-wrap")._tInput;
     const pop = document.createElement("div");
     pop.className = "popover";
     pop.innerHTML = `
-      <button class="popover-item" data-tone="texting">
+      <button class="popover-item ${btn.dataset.tone === "texting" ? "popover-item--active" : ""}" data-tone="texting">
         <span class="popover-item-label">Casual</span>
-        <span class="popover-item-sub">texting</span>
+        <span class="popover-item-sub">texting ${btn.dataset.tone === "texting" ? "✓" : ""}</span>
       </button>
       <div class="popover-divider"></div>
-      <button class="popover-item ${btn.dataset.tone === "workChat" ? "popover-item--active" : ""}" data-tone="workChat">
+      <button class="popover-item ${(!btn.dataset.tone || btn.dataset.tone === "workChat") ? "popover-item--active" : ""}" data-tone="workChat">
         <span class="popover-item-label">Work Chat</span>
-        <span class="popover-item-sub">friendly ✓</span>
+        <span class="popover-item-sub">default ${(!btn.dataset.tone || btn.dataset.tone === "workChat") ? "✓" : ""}</span>
       </button>
       <div class="popover-divider"></div>
-      <button class="popover-item" data-tone="corporate">
+      <button class="popover-item ${btn.dataset.tone === "corporate" ? "popover-item--active" : ""}" data-tone="corporate">
         <span class="popover-item-label">Formal</span>
-        <span class="popover-item-sub">professional</span>
+        <span class="popover-item-sub">professional ${btn.dataset.tone === "corporate" ? "✓" : ""}</span>
       </button>
       <div class="popover-divider"></div>
       <button class="popover-item popover-item--decode" data-tone="decode">
@@ -171,27 +239,52 @@
 
     pop.querySelectorAll(".popover-item").forEach(item => {
       item.addEventListener("click", (e) => {
+        e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         const tone = item.dataset.tone;
         closePopover();
         if (tone === "decode") {
           runDecode(btn, input);
         } else {
           btn.dataset.tone = tone;
-          handleConvert(btn, tone);
+          const text = getInputText(input);
+          if (text && text.trim().length > 0) {
+            handleConvert(btn, tone);
+          } else {
+            // Pre-selection: Just update the label
+            updatePillLabel(btn, input);
+          }
         }
       });
     });
 
-    document.body.appendChild(pop);
+    pop.addEventListener("mouseleave", () => {
+      setTimeout(() => {
+        const isOverPill = btn.matches(":hover");
+        const isOverPopover = pop.matches(":hover");
+        if (!isOverPill && !isOverPopover) {
+          btn.classList.replace("t-pill--expanded", "t-pill--rest");
+          closePopover();
+        }
+      }, 100);
+    });
+
+    const wrap = btn.closest(".t-wrap");
     const rect = btn.getBoundingClientRect();
-    pop.style.top = `${rect.top - pop.offsetHeight - 8}px`;
-    pop.style.left = `${rect.right - pop.offsetWidth}px`;
+    
+    document.documentElement.appendChild(pop);
+    
+    // Position UPWARDS
+    const popHeight = pop.offsetHeight;
+    pop.style.top = `${rect.top - popHeight - 8}px`;
+    pop.style.left = `${rect.right - 200}px`;
 
     setTimeout(() => document.addEventListener("click", closePopover, { once: true }), 10);
   }
 
   function closePopover() {
+    document.querySelectorAll(".t-pill--popover-open").forEach(b => b.classList.remove("t-pill--popover-open"));
     document.querySelector(".popover")?.remove();
   }
 
@@ -202,7 +295,7 @@
     
     btn.dataset.original = text;
     btn.dataset.state = "loading";
-    btn.classList.add("t-pill--expanded");
+    btn.className = "t-pill t-pill--loading";
     btn.querySelector(".pill-text").textContent = "Converting";
     btn.querySelector(".pill-text").classList.add("pill-text--dim");
 
@@ -212,13 +305,33 @@
           setInputTextWithHighlight(input, text, res.text);
           setDone(btn);
         } else {
-          setIdle(btn);
-          showToast(res?.error || "Failed", "error");
+          setError(btn, res?.error);
         }
       });
     } catch (e) {
       setIdle(btn);
     }
+  }
+
+  const HUMAN_ERRORS = {
+    "NO_TEXT": "Type something first",
+    "AI_FAILED": "Couldn't rewrite this",
+    "AI_BUSY": "AI is busy. Try again soon.",
+    "RATE_LIMIT": "Taking a break. Try in 1 min.",
+    "NETWORK_ERROR": "Check your internet",
+    "SERVER_ERROR": "Something went wrong"
+  };
+
+  function setError(btn, errorKey) {
+    const msg = HUMAN_ERRORS[errorKey] || HUMAN_ERRORS.SERVER_ERROR;
+    btn.dataset.state = "error";
+    btn.className = "t-pill t-pill--error";
+    btn.querySelector(".pill-text").textContent = msg;
+    btn.querySelector(".pill-text").classList.remove("pill-text--dim");
+    
+    setTimeout(() => {
+      if (btn.dataset.state === "error") setIdle(btn);
+    }, 3000);
   }
 
   async function runDecode(btn, input) {
@@ -278,13 +391,26 @@
   }
 
   function getInputText(el) {
-    return (el.innerText || el.textContent || "").trim();
+    // Platform-specific filter: On WhatsApp, ignore quoted messages (replies)
+    const clone = el.cloneNode(true);
+    // WhatsApp quoted text usually resides in a div with data-testid="quoted-message" or similar
+    // We remove elements that look like quotes to only get the NEWLY typed text
+    clone.querySelectorAll('[data-testid*="quote"], [class*="quoted"], [class*="copyable-text"]').forEach(q => q.remove());
+    
+    return (clone.innerText || clone.textContent || "").trim();
   }
 
   function setInputText(el, text) {
     if (el.isContentEditable) {
-      el.innerText = text;
-      el.dispatchEvent(new Event('input', { bubbles: true }));
+      // Precise selection lock
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      
+      document.execCommand('insertText', false, text);
+      el.dispatchEvent(new InputEvent('input', { bubbles: true }));
     } else {
       el.value = text;
       el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -294,16 +420,102 @@
   function setInputTextWithHighlight(el, oldText, newText) {
     if (!el.isContentEditable) { setInputText(el, newText); return; }
     
-    const words = newText.split(" ");
-    el.innerHTML = words.map(w => `<span class="t-hl">${w}</span>`).join(" ");
-    el.dispatchEvent(new Event('input', { bubbles: true }));
+    // 1. Precise Focus
+    el.focus();
     
-    setTimeout(() => {
-      el.querySelectorAll(".t-hl").forEach(h => h.classList.add("t-hl--fade"));
-      setTimeout(() => {
-        el.innerText = newText; // Final clean text
-      }, 2000);
-    }, 1000);
+    // 2. Native Insert (Zero-HTML Strategy)
+    // We clear and insert using ONLY native text commands. 
+    // This satisfies LinkedIn/Slack/Gmail internal state models.
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    
+    document.execCommand('delete', false, null);
+    
+    // Insert the pure text
+    document.execCommand('insertText', false, newText);
+    
+    // 3. Native Highlighting
+    // We color the text WITHOUT adding <span> tags. 
+    // This is invisible to the site's "Illegal HTML" detectors.
+    range.selectNodeContents(el);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('hiliteColor', false, 'rgba(255, 233, 153, 0.45)');
+    
+    // Move cursor to the end
+    sel.collapseToEnd();
+    
+    // 4. Force state sync
+    el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertReplacementText' }));
+    
+    // 5. STICKY CLEANUP (The Native Way)
+    const cleanup = (e) => {
+      // Ignore functional keys (Ctrl, Shift, etc.)
+      if (e.key && e.key.length === 1) {
+        // Selection lock for the whole text
+        const fullRange = document.createRange();
+        fullRange.selectNodeContents(el);
+        const fullSel = window.getSelection();
+        fullSel.removeAllRanges();
+        fullSel.addRange(fullRange);
+        
+        // Remove formatting and background color
+        document.execCommand('hiliteColor', false, 'transparent');
+        document.execCommand('removeFormat', false, null);
+        
+        // Move cursor back to the end so typing continues normally
+        fullSel.collapseToEnd();
+        
+        el.removeEventListener('keydown', cleanup);
+        el._tCleanupActive = false;
+      }
+    };
+
+    if (el._tCleanupActive) el.removeEventListener('keydown', el._tCleanup);
+    el._tCleanup = cleanup;
+    el._tCleanupActive = true;
+    el.addEventListener('keydown', cleanup);
+  }
+
+  function positionPill(btn, input, isFirstLoad = false) {
+    const wrap = btn.closest(".t-wrap");
+    if (!wrap) return;
+    
+    const rect = input.getBoundingClientRect();
+    const isVisible = rect.width > 0 && rect.height > 0;
+    
+    if (!isVisible) {
+      wrap.style.display = "none";
+      return;
+    }
+    
+    wrap.style.display = "block";
+    
+    // Magnetic Logic
+    const targetY = rect.top + (rect.height / 2);
+    // Inner-Right Pivot with Safety Offset
+    const targetX = rect.left + rect.width - 15;
+
+    if (isFirstLoad || !wrap._lastX) {
+      wrap._lastX = targetX;
+      wrap._lastY = targetY;
+    } else {
+      // High-performance magnetic drift
+      wrap._lastX += (targetX - wrap._lastX) * 0.25;
+      wrap._lastY += (targetY - wrap._lastY) * 0.25;
+    }
+
+    wrap.style.top = `${wrap._lastY}px`;
+    wrap.style.left = `${wrap._lastX}px`;
+    wrap.style.zIndex = "2147483647"; // Absolute top
+    
+    btn.style.position = "absolute";
+    btn.style.right = "8px"; 
+    btn.style.top = "0";
+    btn.style.transform = "translateY(-50%)";
   }
 
   function showToast(msg, type) {
@@ -323,5 +535,6 @@
   const observer = new MutationObserver(scan);
   observer.observe(document.body, { childList: true, subtree: true });
   scan();
+  watchdog();
 
 })();
