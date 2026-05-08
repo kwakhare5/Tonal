@@ -92,57 +92,6 @@
       box-shadow: 0 0 0 1px #09090b;
     }
 
-    .slider-container {
-      margin-top: 12px;
-    }
-    
-    input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      background: transparent;
-      margin: 0;
-    }
-    
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      height: 20px;
-      width: 20px;
-      border-radius: 50%;
-      background: #09090b;
-      cursor: pointer;
-      margin-top: -8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: box-shadow 0.2s;
-    }
-    
-    input[type="range"]::-webkit-slider-runnable-track {
-      width: 100%;
-      height: 4px;
-      cursor: pointer;
-      background: #e4e4e7;
-      border-radius: 2px;
-    }
-
-    input[type="range"]:focus {
-      outline: none;
-    }
-    
-    input[type="range"]:focus::-webkit-slider-thumb {
-      box-shadow: 0 0 0 4px rgba(9, 9, 11, 0.1);
-    }
-    
-    .slider-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 11px;
-      color: #71717a;
-      font-weight: 500;
-      padding: 0 2px;
-    }
-    
     details {
       margin-bottom: 24px;
       border: 1px solid #e4e4e7;
@@ -265,19 +214,7 @@
     <span id="connected-badge" class="badge">Ready</span>
   </div>
   <p class="tagline">Find the perfect tone, every time.</p>
-  
-  <div class="form-group">
-    <label for="default-tone-slider">Default Tone Level</label>
-    <div class="slider-container">
-      <input type="range" id="default-tone-slider" min="0" max="2" step="1" value="1">
-      <div class="slider-labels">
-        <span>Texting</span>
-        <span>Work Chat</span>
-        <span>Corporate</span>
-      </div>
-    </div>
-  </div>
-  
+
   <details>
     <summary>Advanced / Custom API Key</summary>
     <div class="form-group" style="margin-bottom: 0;">

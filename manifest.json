@@ -2,6 +2,11 @@
   "manifest_version": 3,
   "name": "Tonal",
   "version": "1.0.0",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "description": "Convert casual messages to professional, or decode corporate speak into plain English. Works in Gmail, Slack, LinkedIn, WhatsApp Web.",
   "permissions": [
     "storage",

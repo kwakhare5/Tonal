@@ -1,225 +1,199 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+/* ── ToneShift Extension Styles ──────────────────────────────────────────── */
 
-/* Tonal Base Styles - Modern White Theme */
-
-:root {
-  --ts-bg: #ffffff;
-  --ts-bg-hover: #fcfcfc;
-  --ts-border: #e4e4e7;
-  --ts-text-primary: #09090b;
-  --ts-text-secondary: #71717a;
-  --ts-accent: #09090b;
-  --ts-accent-text: #ffffff;
-  --ts-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --ts-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --ts-radius: 8px;
-  --ts-radius-pill: 20px;
-  --ts-font: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-
-.ts-send-wrapper {
-  position: absolute;
-  right: 12px;
-  bottom: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 99999;
-}
-
+/* ── Floating Send Button ────────────────────────────────────────────────── */
 .ts-btn {
-  background-color: var(--ts-accent);
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 9999;
+  height: 24px;
+  padding: 0 10px;
+  background: #6b21ff;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   border: none;
-  color: var(--ts-accent-text);
-  border-radius: var(--ts-radius);
-  padding: 6px 14px;
-  font-family: var(--ts-font);
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: 4px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  line-height: 20px;
-  outline: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+  line-height: 24px;
+  pointer-events: all;
+  transition: background 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 }
 
 .ts-btn:hover {
-  background-color: #27272a;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  background: #5a18e0;
+  box-shadow: 0 2px 6px rgba(107, 33, 255, 0.4);
 }
 
-.ts-btn.loading {
+.ts-btn[data-state="loading"] {
   opacity: 0.7;
-  pointer-events: none;
   cursor: wait;
+  pointer-events: none;
 }
 
-.ts-btn.done {
-  background-color: #f0fdf4;
-  border-color: #bbf7d0;
-  color: #166534;
+.ts-btn[data-state="undo"] {
+  background: #15803d;
 }
 
-.ts-undo-btn {
-  background-color: var(--ts-accent);
-  border: none;
-  color: var(--ts-accent-text);
-  border-radius: var(--ts-radius);
-  padding: 6px 14px;
-  font-family: var(--ts-font);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  line-height: 20px;
-  outline: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.ts-btn[data-state="undo"]:hover {
+  background: #166534;
+  box-shadow: 0 2px 6px rgba(21, 128, 61, 0.4);
 }
 
-.ts-undo-btn:hover {
-  background-color: #27272a;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+/* ── Popover ─────────────────────────────────────────────────────────────── */
+.ts-popover {
+  position: absolute;
+  bottom: 40px;
+  right: 8px;
+  z-index: 99999;
+  width: 160px;
+  background: #1a1a2e;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
 }
 
 .ts-hidden {
   display: none !important;
 }
 
-.ts-icon {
-  font-size: 14px;
-  /* subtle glow effect for the bolt */
-  filter: drop-shadow(0 0 2px rgba(0,0,0,0.1));
-}
-
-.ts-spinner {
-  display: inline-block;
-  animation: ts-spin 1s linear infinite;
-  font-size: 14px;
-}
-
-@keyframes ts-spin {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Decode Floating Button */
-.ts-decode-float {
-  position: fixed;
-  background-color: var(--ts-accent);
-  color: var(--ts-accent-text);
-  border: none;
-  border-radius: var(--ts-radius);
-  padding: 6px 14px;
-  font-family: var(--ts-font);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
+.ts-popover-option {
+  height: 36px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  line-height: 20px;
-  outline: none;
-  z-index: 999999;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.ts-decode-float:hover {
-  background-color: #27272a;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-/* Decode Card */
-.ts-decode-card {
-  position: fixed;
-  background-color: var(--ts-bg);
-  color: var(--ts-text-primary);
-  border: 1px solid var(--ts-border);
-  border-radius: 12px;
-  padding: 16px;
-  font-family: var(--ts-font);
-  font-size: 14px;
-  line-height: 1.5;
-  width: 320px;
-  max-width: 90vw;
-  z-index: 999999;
-  box-shadow: var(--ts-shadow-md), 0 20px 40px rgba(0, 0, 0, 0.04);
-}
-
-.ts-decode-content {
-  margin-bottom: 14px;
-  font-weight: 400;
-}
-
-.ts-copy-btn {
-  background-color: var(--ts-accent);
-  border: none;
-  color: var(--ts-accent-text);
-  border-radius: var(--ts-radius);
-  padding: 6px 14px;
-  font-family: var(--ts-font);
+  padding: 0 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 13px;
-  font-weight: 500;
+  color: #e8e0ff;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  line-height: 20px;
-  outline: none;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 2px solid transparent;
+  box-sizing: border-box;
+  transition: background 0.1s ease, color 0.1s ease;
 }
 
-.ts-copy-btn:hover {
-  background-color: #27272a;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+.ts-popover-option:hover {
+  background: rgba(107, 33, 255, 0.15);
+  color: #ffffff;
 }
 
-/* Toast Notification */
+.ts-popover-option--active {
+  border-left-color: #6b21ff;
+  color: #ffffff;
+}
+
+.ts-popover-divider {
+  height: 1px;
+  background: #2a2a4a;
+  margin: 0;
+}
+
+.ts-decode-row {
+  color: #9d7fff;
+}
+
+/* ── Toast Notification ──────────────────────────────────────────────────── */
 #ts-toast {
   position: fixed;
   bottom: 32px;
   left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  background-color: var(--ts-bg);
-  color: var(--ts-text-primary);
-  padding: 12px 24px;
-  border-radius: var(--ts-radius-pill);
-  border: 1px solid var(--ts-border);
-  font-family: var(--ts-font);
-  font-size: 14px;
+  transform: translateX(-50%) translateY(16px);
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
   font-weight: 500;
-  box-shadow: var(--ts-shadow-md);
-  z-index: 999999;
+  z-index: 9999999;
   opacity: 0;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  white-space: nowrap;
 }
 
 #ts-toast.ts-toast-visible {
-  transform: translateX(-50%) translateY(0);
   opacity: 1;
-}
-
-#ts-toast.error {
-  border-left: 4px solid #ef4444;
-}
-
-#ts-toast.success {
-  border-left: 4px solid #22c55e;
+  transform: translateX(-50%) translateY(0);
 }
 
 #ts-toast.info {
-  border-left: 4px solid var(--ts-accent);
+  background: #1a0a33;
+  color: #c4a4ff;
+}
+
+#ts-toast.success {
+  background: #052e16;
+  color: #86efac;
+}
+
+#ts-toast.error {
+  background: #2d0a0a;
+  color: #fca5a5;
+}
+
+/* ── Selection Decode Float Button ───────────────────────────────────────── */
+.ts-decode-float {
+  position: absolute;
+  z-index: 9999999;
+  height: 24px;
+  padding: 0 10px;
+  background: #6b21ff;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 24px;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ts-decode-float:hover {
+  background: #5a18e0;
+  box-shadow: 0 2px 6px rgba(107, 33, 255, 0.4);
+}
+
+/* ── Decode Result Card ───────────────────────────────────────────────────── */
+.ts-decode-card {
+  position: absolute;
+  z-index: 9999999;
+  width: 320px;
+  max-width: 90vw;
+  background: #1a1a2e;
+  border: 1px solid #2a2a4a;
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.ts-decode-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e8e0ff;
+  margin-bottom: 12px;
+}
+
+.ts-copy-btn {
+  height: 28px;
+  padding: 0 12px;
+  background: #6b21ff;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 28px;
+  transition: background 0.15s ease;
+}
+
+.ts-copy-btn:hover {
+  background: #5a18e0;
 }
