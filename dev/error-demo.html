@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tonal | Error & Notification Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0F0F0F; --white: #FFFFFF; --green: #34C759; --red: #FF3B30;
+            --gray-1: #1C1C1E; --gray-2: #2C2C2E; --gray-3: #3A3A3C; --gray-4: #636366;
+            --gray-5: #AEAEB2; --gray-6: #D1D1D6; --gray-7: #E5E5EA; --gray-8: #F2F2F7; --gray-9: #F5F5F7;
+            --font: 'DM Sans', -apple-system, sans-serif;
+            --sh-lg: 0 24px 64px rgba(0, 0, 0, .12), 0 1px 4px rgba(0, 0, 0, .06);
+            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body {
+            font-family: var(--font);
+            background-color: var(--gray-9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: var(--black);
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+        }
+
+        h1 { font-size: 24px; margin-bottom: 8px; }
+        p { color: var(--gray-4); margin-bottom: 32px; font-size: 14px; }
+
+        .btn-grid {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--gray-7);
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            border-color: var(--gray-4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot--success { background: #4ade80; }
+        .dot--error { background: #f87171; }
+        .dot--warn { background: #fbbf24; }
+        .dot--info { background: #8888ff; }
+
+        /* TOAST STYLES (MATCHES PRODUCTION) */
+        .toast {
+            position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
+            border-radius: 100px; font-size: 12px; font-weight: 600;
+            background: var(--black); box-shadow: var(--sh-lg);
+            z-index: 9999; opacity: 0; transition: all 0.4s var(--spring);
+            pointer-events: none; color: var(--white);
+        }
+        .toast--active { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        
+        .toast--success { color: #4ade80; }
+        .toast--error { color: #f87171; }
+        .toast--warn { color: #fbbf24; }
+        .toast--info { color: #e8e8ff; }
+
+        .toast--success .toast-dot { background: #4ade80; }
+        .toast--error .toast-dot { background: #f87171; }
+        .toast--warn .toast-dot { background: #fbbf24; }
+        .toast--info .toast-dot { background: #8888ff; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Tonal Error Demo</h1>
+        <p>Click the buttons below to trigger the production error/notification UI.</p>
+        
+        <div class="btn-grid">
+            <button class="btn" onclick="showToast('Success! Message shifted.', 'success')">
+                <div class="dot dot--success"></div> Success
+            </button>
+            <button class="btn" onclick="showToast('Check your internet', 'error')">
+                <div class="dot dot--error"></div> Error
+            </button>
+            <button class="btn" onclick="showToast('Type something first', 'warn')">
+                <div class="dot dot--warn"></div> Warning
+            </button>
+            <button class="btn" onclick="showToast('Decoding message...', 'info')">
+                <div class="dot dot--info"></div> Info
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function showToast(msg, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast toast--${type}`;
+            
+            const dot = document.createElement('div');
+            dot.className = 'toast-dot';
+            
+            const text = document.createElement('span');
+            text.textContent = msg;
+            
+            toast.appendChild(dot);
+            toast.appendChild(text);
+            document.body.appendChild(toast);
+            
+            // Animate In
+            requestAnimationFrame(() => {
+                toast.classList.add('toast--active');
+            });
+            
+            // Animate Out
+            setTimeout(() => {
+                toast.classList.remove('toast--active');
+                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
