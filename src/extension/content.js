@@ -410,10 +410,11 @@
       input.focus();
       document.execCommand('selectAll', false, null);
 
-      // 1. Synthetic Paste Event (Critical for Lexical / Draft.js / WhatsApp)
+      // 1. Synthetic Paste Event
       const dataTransfer = new DataTransfer();
       dataTransfer.setData('text/plain', text);
       if (isRichText) dataTransfer.setData('text/html', text);
+      
       const pasteEvent = new ClipboardEvent('paste', {
         clipboardData: dataTransfer,
         bubbles: true,
@@ -421,7 +422,13 @@
       });
       input.dispatchEvent(pasteEvent);
 
-      // 2. Synthetic beforeinput Event (Critical for React 18+ / LinkedIn)
+      // If framework handled the paste, stop to prevent duplication.
+      if (pasteEvent.defaultPrevented) {
+        input.blur(); input.focus();
+        return;
+      }
+
+      // 2. Synthetic beforeinput Event
       const beforeInputEvent = new InputEvent('beforeinput', {
         inputType: isRichText ? 'insertFromPaste' : 'insertText',
         data: text,
@@ -430,29 +437,19 @@
       });
       input.dispatchEvent(beforeInputEvent);
 
-      // 3. Native DOM Mutation
+      // If framework handled beforeinput, stop.
+      if (beforeInputEvent.defaultPrevented) {
+        input.blur(); input.focus();
+        return;
+      }
+
+      // 3. Native DOM Mutation (Fallback for basic inputs like Sandbox)
       const command = isRichText ? 'insertHTML' : 'insertText';
       document.execCommand(command, false, text);
-
-      // 4. Synthetic input/change Events (Critical for React 16/17)
-      const inputEvent = new InputEvent('input', {
-        inputType: 'insertText',
-        data: text,
-        bubbles: true,
-        cancelable: false
-      });
-      input.dispatchEvent(inputEvent);
+        
+      // Notify basic listeners
+      input.dispatchEvent(new Event('input', { bubbles: true }));
       input.dispatchEvent(new Event('change', { bubbles: true }));
-
-      // 5. Synthetic keyup Event (Critical for listeners waiting for keyboard end)
-      const keyupEvent = new KeyboardEvent('keyup', {
-        key: 'Space',
-        code: 'Space',
-        keyCode: 32,
-        bubbles: true,
-        cancelable: true
-      });
-      input.dispatchEvent(keyupEvent);
 
       // Force framework re-render flush
       input.blur();
