@@ -1,4 +1,6 @@
-# Environment & secrets — never commit these
+# Tonal — Project Exclusions
+
+# Build & Secrets
 .env
 .env.local
 .env.*
@@ -6,14 +8,26 @@
 config.local.js
 secrets.js
 secrets.json
+*.zip
+*.pem
 
-# OS files
+# Cloudflare / Wrangler
+.wrangler/
+dist/
+node_modules/
+package-lock.json
+
+# OS & Editors
 .DS_Store
 Thumbs.db
-
-# Editor
 .vscode/
 .idea/
+.fleet/
+.hx/
 
-# Node (if ever used)
-node_modules/
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

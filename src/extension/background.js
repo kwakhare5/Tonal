@@ -1,6 +1,11 @@
 // background.js — Tonal Proxy Client
 const WORKER_URL = "https://tonal-proxy.kwakhare5.workers.dev";
 
+/**
+ * @param {Object} request
+ * @param {chrome.runtime.MessageSender} sender
+ * @param {function(APIResponse):void} sendResponse
+ */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type !== "TONESHIFT_CONVERT" && request.type !== "TONESHIFT_DECODE") return;
 

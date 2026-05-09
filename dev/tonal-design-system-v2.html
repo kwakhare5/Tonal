@@ -1,0 +1,2644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tonal — Design System v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    /* ── TOKENS ────────────────────────────────────────────────── */
+    :root {
+      /* Colour */
+      --black: #0F0F0F;
+      --gray-1: #1C1C1E;
+      --gray-2: #2C2C2E;
+      --gray-3: #3A3A3C;
+      --gray-4: #636366;
+      --gray-5: #AEAEB2;
+      --gray-6: #D1D1D6;
+      --gray-7: #E5E5EA;
+      --gray-8: #F2F2F7;
+      --gray-9: #F5F5F7;
+      --white: #FFFFFF;
+      --green: #34C759;
+      --red: #FF3B30;
+      --orange: #FF9F0A;
+
+      /* Type */
+      --font: 'DM Sans', -apple-system, sans-serif;
+      --mono: 'DM Mono', 'SF Mono', monospace;
+
+      /* Radius */
+      --r-sm: 6px;
+      --r-md: 10px;
+      --r-lg: 14px;
+      --r-xl: 20px;
+      --r-pill: 100px;
+
+      /* Shadow */
+      --sh-xs: 0 1px 2px rgba(0, 0, 0, .06);
+      --sh-sm: 0 1px 4px rgba(0, 0, 0, .06), 0 4px 12px rgba(0, 0, 0, .06);
+      --sh-md: 0 2px 8px rgba(0, 0, 0, .06), 0 12px 32px rgba(0, 0, 0, .08);
+      --sh-lg: 0 8px 24px rgba(0, 0, 0, .1), 0 24px 64px rgba(0, 0, 0, .12);
+
+      /* Spacing */
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 12px;
+      --sp-4: 16px;
+      --sp-5: 20px;
+      --sp-6: 24px;
+      --sp-7: 32px;
+      --sp-8: 48px;
+      --sp-9: 64px;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.2, 0, 0, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ── BASE ───────────────────────────────────────────────────── */
+    body {
+      font-family: var(--font);
+      background: var(--gray-9);
+      color: var(--black);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 64px;
+    }
+
+    /* ── DS HEADER ──────────────────────────────────────────────── */
+    .ds-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 72px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--gray-7);
+    }
+
+    .ds-header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .ds-logo {
+      width: 52px;
+      height: 52px;
+      background: var(--black);
+      border-radius: var(--r-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--sh-sm);
+      flex-shrink: 0;
+    }
+
+    .ds-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .ds-subtitle {
+      font-size: 13px;
+      color: var(--gray-4);
+      margin-top: 2px;
+    }
+
+    .ds-version {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gray-5);
+      background: var(--gray-8);
+      border: 1px solid var(--gray-7);
+      border-radius: var(--r-pill);
+      padding: 4px 10px;
+    }
+
+    /* ── SECTION ────────────────────────────────────────────────── */
+    .section {
+      margin-bottom: 80px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--gray-7);
+    }
+
+    .section-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--gray-5);
+      background: var(--gray-8);
+      border-radius: var(--r-sm);
+      padding: 2px 6px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-4);
+    }
+
+    /* ── CARD ───────────────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--gray-7);
+      box-shadow: var(--sh-sm);
+      padding: var(--sp-6);
+    }
+
+    .card-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray-5);
+      margin-bottom: var(--sp-4);
+    }
+
+    /* ── GRID ───────────────────────────────────────────────────── */
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-6);
+    }
+
+    .g3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--sp-6);
+    }
+
+    .g4 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: var(--sp-5);
+    }
+
+    /* ── CAPTION ────────────────────────────────────────────────── */
+    .cap {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gray-5);
+      margin-top: 12px;
+      text-align: center;
+    }
+
+
+    /* ════════════════════════════════════════════════
+   1. BRAND & ICON
+═════════════════════════════════════════════════ */
+    .icon-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .icon-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-box {
+      background: var(--black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--sh-md);
+      flex-shrink: 0;
+    }
+
+    .icon-box svg {
+      display: block;
+    }
+
+    .icon-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--gray-5);
+    }
+
+    /* toolbar mockup */
+    .chrome-toolbar {
+      background: #292929;
+      border-radius: var(--r-md);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chrome-toolbar-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--black);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ════════════════════════════════════════════════
+   2. COLOUR
+═════════════════════════════════════════════════ */
+    .palette {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .swatch-box {
+      width: 68px;
+      height: 68px;
+      border-radius: var(--r-md);
+      border: 1px solid rgba(0, 0, 0, .06);
+    }
+
+    .swatch-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    .swatch-hex {
+      font-size: 10px;
+      color: var(--gray-4);
+      font-family: var(--mono);
+    }
+
+    .swatch-use {
+      font-size: 10px;
+      color: var(--gray-5);
+    }
+
+    /* ════════════════════════════════════════════════
+   3. TYPOGRAPHY
+═════════════════════════════════════════════════ */
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--gray-8);
+    }
+
+    .type-meta {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--gray-5);
+      width: 140px;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    /* ════════════════════════════════════════════════
+   4. SPACING
+═════════════════════════════════════════════════ */
+    .spacing-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .spacing-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .spacing-bar {
+      background: var(--black);
+      height: 4px;
+      border-radius: 2px;
+    }
+
+    .spacing-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--gray-4);
+    }
+
+    /* ════════════════════════════════════════════════
+   5. THE PILL COMPONENT
+═════════════════════════════════════════════════ */
+    .pill-grid {
+      display: grid;
+      grid-template-columns: repeat(6, auto);
+      gap: 32px;
+      align-items: end;
+      justify-content: start;
+    }
+
+    .pill-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pill-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gray-5);
+    }
+
+    /* The pill itself */
+    .t-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--black);
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .16);
+      transition: transform .15s var(--ease-out), background .15s, box-shadow .15s;
+    }
+
+    .t-pill--rest {
+      width: 30px;
+      height: 16px;
+    }
+
+    .t-pill--hover {
+      width: 30px;
+      height: 16px;
+      transform: scale(1.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+    }
+
+    .t-pill--expanded {
+      height: 24px;
+      padding: 0 9px;
+      gap: 5px;
+    }
+
+    .t-pill--loading {
+      height: 24px;
+      padding: 0 9px;
+      opacity: .55;
+    }
+
+    .t-pill--done {
+      height: 24px;
+      padding: 0 10px;
+      background: var(--green);
+      box-shadow: 0 1px 4px rgba(52, 199, 89, .35);
+    }
+
+    .t-pill--error {
+      height: 24px;
+      padding: 0 9px;
+      background: var(--red);
+    }
+
+    .pill-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pill-icon svg {
+      display: block;
+    }
+
+    .pill-text {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      font-family: var(--font);
+    }
+
+    /* Loading dots animation */
+    .pill-dots::after {
+      content: '';
+      display: inline-block;
+      animation: dots 1.2s steps(4) infinite;
+    }
+
+    @keyframes dots {
+      0% {
+        content: '';
+      }
+
+      25% {
+        content: '.';
+      }
+
+      50% {
+        content: '..';
+      }
+
+      75% {
+        content: '...';
+      }
+    }
+
+    /* ════════════════════════════════════════════════
+   6. POPOVER
+═════════════════════════════════════════════════ */
+    .popover {
+      width: 192px;
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--gray-7);
+      box-shadow: var(--sh-lg);
+      overflow: hidden;
+    }
+
+    .pop-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 15px;
+      cursor: pointer;
+      transition: background .08s;
+    }
+
+    .pop-item:hover {
+      background: var(--gray-9);
+    }
+
+    .pop-item--active {
+      background: var(--black);
+    }
+
+    .pop-item--active .pop-label,
+    .pop-item--active .pop-sub,
+    .pop-item--active .pop-check {
+      color: var(--white);
+    }
+
+    .pop-item--decode {}
+
+    .pop-item--decode .pop-label {
+      color: var(--gray-4);
+      font-weight: 400;
+    }
+
+    .pop-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black);
+    }
+
+    .pop-sub {
+      font-size: 10px;
+      color: var(--gray-5);
+    }
+
+    .pop-check {
+      font-size: 11px;
+      color: var(--black);
+      font-weight: 600;
+    }
+
+    .pop-divider {
+      height: 1px;
+      background: var(--gray-8);
+    }
+
+    .pop-divider--strong {
+      height: 1px;
+      background: var(--gray-7);
+    }
+
+    /* ════════════════════════════════════════════════
+   7. PLATFORM MOCKUPS
+═════════════════════════════════════════════════ */
+    .mockup-cap {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray-5);
+      margin-bottom: 12px;
+    }
+
+    /* ─ WhatsApp ─ */
+    .wa {
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      box-shadow: var(--sh-md);
+    }
+
+    .wa-head {
+      background: #128C7E;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wa-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: white;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .wa-nm {
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .wa-st {
+      font-size: 11px;
+      color: rgba(255, 255, 255, .7);
+    }
+
+    .wa-chat {
+      background: #ECE5DD;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 100px;
+    }
+
+    .wa-bub {
+      padding: 8px 12px 6px;
+      border-radius: 10px;
+      max-width: 75%;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .wa-bub-in {
+      background: white;
+      align-self: flex-start;
+      border-top-left-radius: 2px;
+      color: #111;
+    }
+
+    .wa-bub-out {
+      background: #DCF8C6;
+      align-self: flex-end;
+      border-top-right-radius: 2px;
+      color: #111;
+    }
+
+    .wa-ts {
+      font-size: 9px;
+      color: rgba(0, 0, 0, .4);
+      display: block;
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    .wa-bar {
+      background: #F0F0F0;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .wa-field {
+      flex: 1;
+      background: white;
+      border-radius: 22px;
+      padding: 7px 10px;
+      font-size: 13px;
+      color: #555;
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 36px;
+      box-shadow: var(--sh-xs);
+      gap: 8px;
+    }
+
+    .wa-field-text {
+      flex: 1;
+      font-size: 13px;
+      font-family: var(--font);
+    }
+
+    .wa-send {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #25D366;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .wa-emoji-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--gray-7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    /* ─ Slack ─ */
+    .sl {
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      box-shadow: var(--sh-md);
+      border: 1px solid #e0e0e0;
+      background: white;
+    }
+
+    .sl-head {
+      background: #3F0F40;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sl-hash {
+      font-size: 16px;
+      color: rgba(255, 255, 255, .7);
+      font-weight: 700;
+    }
+
+    .sl-chan {
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .sl-msgs {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: white;
+    }
+
+    .sl-msg {
+      display: flex;
+      gap: 10px;
+    }
+
+    .sl-av {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      font-size: 12px;
+      color: white;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sl-msg-meta {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1D1C1D;
+      margin-bottom: 2px;
+    }
+
+    .sl-msg-meta span {
+      font-size: 10px;
+      font-weight: 400;
+      color: #616061;
+      margin-left: 6px;
+    }
+
+    .sl-msg-text {
+      font-size: 13px;
+      color: #1D1C1D;
+      line-height: 1.4;
+    }
+
+    .sl-compose-area {
+      border-top: 1px solid #EEE;
+      padding: 10px 14px 12px;
+    }
+
+    .sl-compose {
+      border: 1px solid #BBB;
+      border-radius: var(--r-md);
+      min-height: 72px;
+      position: relative;
+      font-size: 13px;
+      color: #1D1C1D;
+      overflow: hidden;
+    }
+
+    .sl-compose-top {
+      padding: 10px 12px 6px;
+    }
+
+    .sl-compose-placeholder {
+      color: #888;
+    }
+
+    .sl-compose-text {
+      color: #1D1C1D;
+    }
+
+    .sl-compose-toolbar {
+      border-top: 1px solid #EEE;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #FAFAFA;
+    }
+
+    .sl-toolbar-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      background: var(--gray-8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--gray-4);
+      cursor: pointer;
+    }
+
+    .sl-send {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #007A5A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    /* ─ Gmail ─ */
+    .gm {
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      box-shadow: var(--sh-md);
+      background: white;
+      border: 1px solid var(--gray-7);
+    }
+
+    .gm-head {
+      background: white;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--gray-7);
+    }
+
+    .gm-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #202124;
+    }
+
+    .gm-close {
+      font-size: 16px;
+      color: #5f6368;
+      cursor: pointer;
+    }
+
+    .gm-field {
+      border-bottom: 1px solid var(--gray-7);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gm-field-label {
+      font-size: 12px;
+      color: #5f6368;
+      width: 24px;
+      flex-shrink: 0;
+    }
+
+    .gm-field-val {
+      font-size: 13px;
+      color: #202124;
+    }
+
+    .gm-body {
+      padding: 12px 14px;
+      min-height: 80px;
+      font-size: 13px;
+      color: #202124;
+      line-height: 1.5;
+    }
+
+    .gm-footer {
+      border-top: 1px solid var(--gray-7);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gm-send {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      height: 32px;
+      font-family: var(--font);
+    }
+
+    .gm-toolbar-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      background: var(--gray-8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--gray-4);
+    }
+
+    /* ─ LinkedIn ─ */
+    .li {
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      box-shadow: var(--sh-md);
+      background: white;
+    }
+
+    .li-head {
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--gray-7);
+      background: white;
+    }
+
+    .li-av {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #0A66C2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: white;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .li-nm {
+      font-size: 13px;
+      font-weight: 700;
+      color: #000000E6;
+    }
+
+    .li-role {
+      font-size: 11px;
+      color: var(--gray-4);
+    }
+
+    .li-msgs {
+      padding: 14px;
+      background: #F3F2EF;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .li-bub {
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 82%;
+    }
+
+    .li-bub-in {
+      background: white;
+      color: #191919;
+      align-self: flex-start;
+      box-shadow: var(--sh-xs);
+    }
+
+    .li-bub-out {
+      background: #DCEEFF;
+      color: #191919;
+      align-self: flex-end;
+    }
+
+    .li-input-area {
+      border-top: 1px solid var(--gray-7);
+      background: white;
+      padding: 10px 14px;
+    }
+
+    .li-field {
+      border: 1.5px solid var(--gray-7);
+      border-radius: var(--r-md);
+      padding: 9px 40px 9px 12px;
+      font-size: 13px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      font-family: var(--font);
+    }
+
+    .li-bottom-bar {
+      border-top: 1px solid var(--gray-7);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+    }
+
+    .li-send {
+      background: #0A66C2;
+      color: white;
+      border: none;
+      border-radius: var(--r-pill);
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: auto;
+      font-family: var(--font);
+      height: 30px;
+    }
+
+    /* Tonal pill inside input — shared */
+    .in-pill {
+      background: var(--black);
+      border-radius: var(--r-pill);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+    }
+
+    /* ════════════════════════════════════════════════
+   8. HIGHLIGHT — BEFORE / AFTER
+═════════════════════════════════════════════════ */
+    .ba-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .ba-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--gray-5);
+    }
+
+    .ba-field {
+      background: var(--white);
+      border: 1.5px solid var(--gray-7);
+      border-radius: var(--r-md);
+      padding: 12px 14px;
+      font-size: 14px;
+      color: var(--black);
+      line-height: 1.6;
+      position: relative;
+      font-family: var(--font);
+    }
+
+    .ba-field--after {
+      border-color: var(--gray-6);
+    }
+
+    .hl {
+      background: var(--gray-8);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    .undo-pill {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      background: var(--green);
+      border-radius: var(--r-pill);
+      padding: 3px 9px;
+      font-size: 10px;
+      font-weight: 700;
+      color: white;
+      font-family: var(--font);
+    }
+
+    /* ════════════════════════════════════════════════
+   9. DECODE FLOATING BUTTON
+═════════════════════════════════════════════════ */
+    .decode-float {
+      display: inline-flex;
+      align-items: center;
+      background: var(--black);
+      color: var(--white);
+      border-radius: var(--r-pill);
+      padding: 6px 13px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+      font-family: var(--font);
+      letter-spacing: .01em;
+    }
+
+    /* ════════════════════════════════════════════════
+   10. DECODE RESULT CARD
+═════════════════════════════════════════════════ */
+    .decode-card {
+      width: 288px;
+      background: var(--white);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--gray-7);
+      box-shadow: var(--sh-lg);
+      overflow: hidden;
+    }
+
+    .decode-card-header {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--gray-8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .decode-card-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--gray-4);
+    }
+
+    .decode-card-close {
+      width: 18px;
+      height: 18px;
+      background: var(--gray-8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--gray-4);
+      cursor: pointer;
+    }
+
+    .decode-card-body {
+      padding: 14px;
+    }
+
+    .decode-card-text {
+      font-size: 14px;
+      color: var(--black);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .decode-card-copy {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--gray-9);
+      border: 1px solid var(--gray-7);
+      border-radius: var(--r-sm);
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--black);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all .15s ease;
+    }
+
+    .decode-card-copy:hover {
+      background: var(--gray-8);
+      border-color: var(--gray-6);
+    }
+
+    .decode-card-copy--copied {
+      background: var(--green) !important;
+      border-color: var(--green) !important;
+      color: var(--white) !important;
+    }
+
+    .decode-card-copy svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* ════════════════════════════════════════════════
+   11. TOASTS
+═════════════════════════════════════════════════ */
+    .toast {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: var(--r-pill);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .15);
+      white-space: nowrap;
+      background: var(--black);
+    }
+
+    .toast--success {
+      color: #4ade80;
+    }
+
+    .toast--error {
+      color: #f87171;
+    }
+
+    .toast--warn {
+      color: #fbbf24;
+    }
+
+    .toast--info {
+      color: #e8e8ff;
+    }
+
+    .toast-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .toast-dot--success {
+      background: #4ade80;
+    }
+
+    .toast-dot--error {
+      background: #f87171;
+    }
+
+    .toast-dot--warn {
+      background: #fbbf24;
+    }
+
+    .toast-dot--info {
+      background: #8888ff;
+    }
+
+    /* ════════════════════════════════════════════════
+   12. EXTENSION POPUP
+═════════════════════════════════════════════════ */
+    .popup-shell {
+      width: 280px;
+      background: var(--white);
+      border-radius: var(--r-xl);
+      border: 1px solid var(--gray-7);
+      box-shadow: var(--sh-lg);
+      overflow: hidden;
+    }
+
+    .popup-head {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--gray-8);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .popup-logo {
+      width: 36px;
+      height: 36px;
+      background: var(--black);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .popup-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--black);
+      letter-spacing: -.02em;
+    }
+
+    .popup-sub {
+      font-size: 11px;
+      color: var(--gray-4);
+      margin-top: 1px;
+    }
+
+    .popup-body {
+      padding: 16px 18px;
+    }
+
+    .popup-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #F0FDF4;
+      border: 1px solid #D1FAE5;
+      border-radius: var(--r-md);
+      padding: 8px 12px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #059669;
+    }
+
+    .popup-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    .popup-field-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--gray-5);
+      margin-bottom: 7px;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      background: var(--gray-8);
+      border-radius: var(--r-md);
+      padding: 3px;
+      gap: 2px;
+      margin-bottom: 14px;
+    }
+
+    .seg-item {
+      padding: 7px 4px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--gray-4);
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      font-family: var(--font);
+    }
+
+    .seg-item--active {
+      background: var(--white);
+      color: var(--black);
+      font-weight: 600;
+      box-shadow: var(--sh-xs);
+    }
+
+    .popup-save {
+      width: 100%;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: var(--r-md);
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      letter-spacing: -.01em;
+    }
+
+    .popup-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--gray-8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .popup-platforms {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .platform-tag {
+      background: var(--gray-8);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--gray-4);
+    }
+
+    /* ════════════════════════════════════════════════
+   13. MOTION
+═════════════════════════════════════════════════ */
+    .motion-row {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .motion-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--gray-8);
+    }
+
+    .motion-name {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--black);
+      width: 100px;
+      flex-shrink: 0;
+      font-weight: 500;
+    }
+
+    .motion-curve {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--gray-4);
+      width: 240px;
+      flex-shrink: 0;
+    }
+
+    .motion-use {
+      font-size: 12px;
+      color: var(--gray-4);
+    }
+
+    .motion-dur {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--gray-5);
+      width: 50px;
+      flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════════════════════
+   14. ERROR STATES
+═════════════════════════════════════════════════ */
+    .error-table {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .error-row {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray-8);
+      gap: 16px;
+    }
+
+    .error-code {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gray-5);
+      width: 130px;
+      flex-shrink: 0;
+    }
+
+    .error-msg {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--black);
+      flex: 1;
+    }
+
+    .error-note {
+      font-size: 11px;
+      color: var(--gray-4);
+      width: 200px;
+      flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════════════════════
+   15. PLATFORM SELECTORS
+═════════════════════════════════════════════════ */
+    code {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gray-3);
+      background: var(--gray-9);
+      border: 1px solid var(--gray-7);
+      border-radius: 4px;
+      padding: 3px 7px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* ════════════════════════════════════════════════
+   16. SKELETON & COACH MARK
+═════════════════════════════════════════════════ */
+    .skeleton {
+      background: linear-gradient(90deg, var(--gray-8) 25%, var(--gray-7) 50%, var(--gray-8) 75%);
+      background-size: 200% 100%;
+      animation: skel 1.5s linear infinite;
+      border-radius: 4px;
+    }
+
+    @keyframes skel {
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    .coach-mark {
+      background: var(--black);
+      color: white;
+      padding: 10px 14px;
+      border-radius: var(--r-md);
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+      font-family: var(--font);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <!-- DS HEADER -->
+    <div class="ds-header">
+      <div class="ds-header-left">
+        <div class="ds-logo">
+          <svg width="30" height="18" viewBox="0 0 72 44" fill="none">
+            <rect x="0" y="18" width="72" height="8" rx="4" fill="#2C2C2E" />
+            <rect x="0" y="18" width="39" height="8" rx="4" fill="#FFFFFF" />
+            <circle cx="39" cy="22" r="15" fill="white" />
+            <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+          </svg>
+        </div>
+        <div>
+          <div class="ds-title">Tonal Design System</div>
+          <div class="ds-subtitle">The complete source of truth for the Tonal Chrome Extension</div>
+        </div>
+      </div>
+      <span class="ds-version">v2.0 · Light Theme · Monochrome</span>
+    </div>
+
+
+    <!-- ═══════════════════════════ 1. BRAND & ICON ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <span class="section-title">Brand & Extension Icon</span>
+      </div>
+      <div class="card">
+        <div class="icon-row">
+
+          <!-- 128 -->
+          <div class="icon-item">
+            <div class="icon-box" style="width:128px;height:128px;border-radius:28px;">
+              <svg width="72" height="44" viewBox="0 0 72 44" fill="none">
+                <rect x="0" y="18" width="72" height="8" rx="4" fill="#2C2C2E" />
+                <rect x="0" y="18" width="39" height="8" rx="4" fill="#FFFFFF" />
+                <circle cx="39" cy="22" r="16" fill="#F2F2F2" />
+                <circle cx="39" cy="22" r="14.5" fill="white" />
+                <circle cx="39" cy="22" r="9" fill="#1C1C1E" />
+                <circle cx="39" cy="22" r="4" fill="#3A3A3C" />
+              </svg>
+            </div>
+            <div class="icon-label">128 × 128</div>
+            <div style="font-size:10px;color:var(--gray-5);">Chrome Store</div>
+          </div>
+
+          <!-- 64 -->
+          <div class="icon-item">
+            <div class="icon-box" style="width:64px;height:64px;border-radius:14px;">
+              <svg width="36" height="22" viewBox="0 0 72 44" fill="none">
+                <rect x="0" y="18" width="72" height="8" rx="4" fill="#2C2C2E" />
+                <rect x="0" y="18" width="39" height="8" rx="4" fill="#FFF" />
+                <circle cx="39" cy="22" r="16" fill="white" />
+                <circle cx="39" cy="22" r="9" fill="#1C1C1E" />
+              </svg>
+            </div>
+            <div class="icon-label">64 × 64</div>
+          </div>
+
+          <!-- 48 -->
+          <div class="icon-item">
+            <div class="icon-box" style="width:48px;height:48px;border-radius:11px;">
+              <svg width="26" height="16" viewBox="0 0 72 44" fill="none">
+                <rect x="0" y="18" width="72" height="8" rx="4" fill="#2C2C2E" />
+                <rect x="0" y="18" width="39" height="8" rx="4" fill="#FFF" />
+                <circle cx="39" cy="22" r="16" fill="white" />
+                <circle cx="39" cy="22" r="9" fill="#1C1C1E" />
+              </svg>
+            </div>
+            <div class="icon-label">48 × 48</div>
+          </div>
+
+          <!-- 32 -->
+          <div class="icon-item">
+            <div class="icon-box" style="width:32px;height:32px;border-radius:7px;">
+              <svg width="17" height="11" viewBox="0 0 72 44" fill="none">
+                <rect x="0" y="18" width="72" height="8" rx="4" fill="#2C2C2E" />
+                <rect x="0" y="18" width="39" height="8" rx="4" fill="#FFF" />
+                <circle cx="39" cy="22" r="16" fill="white" />
+                <circle cx="39" cy="22" r="9" fill="#1C1C1E" />
+              </svg>
+            </div>
+            <div class="icon-label">32 × 32</div>
+          </div>
+
+          <!-- 16 -->
+          <div class="icon-item">
+            <div class="icon-box" style="width:16px;height:16px;border-radius:4px;background:#0F0F0F;"></div>
+            <div class="icon-label">16 × 16</div>
+          </div>
+
+          <!-- Chrome toolbar -->
+          <div class="icon-item" style="margin-left:24px;">
+            <div class="chrome-toolbar">
+              <div class="chrome-toolbar-icon">
+                <svg width="14" height="9" viewBox="0 0 72 44" fill="none">
+                  <rect x="0" y="18" width="72" height="8" rx="4" fill="#2C2C2E" />
+                  <rect x="0" y="18" width="39" height="8" rx="4" fill="#FFF" />
+                  <circle cx="39" cy="22" r="16" fill="white" />
+                  <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+                </svg>
+              </div>
+              <span style="font-size:12px;color:#E5E5EA;font-weight:500;">Tonal</span>
+            </div>
+            <div class="icon-label">Chrome toolbar</div>
+          </div>
+
+        </div>
+
+        <div
+          style="margin-top:24px;padding-top:20px;border-top:1px solid var(--gray-8);font-size:12px;color:var(--gray-4);line-height:1.6;">
+          The icon mark is a <strong style="color:var(--black);">tone slider</strong> — track + thumb. Always near-black
+          background. White elements only. No colour. Reads at every size. The slider thumb sits at ~55% to imply an
+          active, mid-state tone choice.
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 2. COLOUR ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <span class="section-title">Colour Palette</span>
+      </div>
+      <div class="card">
+        <div class="palette">
+          <div class="swatch">
+            <div class="swatch-box" style="background:#0F0F0F;"></div>
+            <div class="swatch-name">Black</div>
+            <div class="swatch-hex">#0F0F0F</div>
+            <div class="swatch-use">Pill, icon bg, text</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#1C1C1E;"></div>
+            <div class="swatch-name">Gray 1</div>
+            <div class="swatch-hex">#1C1C1E</div>
+            <div class="swatch-use">Pill hover</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#3A3A3C;"></div>
+            <div class="swatch-name">Gray 3</div>
+            <div class="swatch-hex">#3A3A3C</div>
+            <div class="swatch-use">Icon inner detail</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#636366;"></div>
+            <div class="swatch-name">Gray 4</div>
+            <div class="swatch-hex">#636366</div>
+            <div class="swatch-use">Secondary text</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#AEAEB2;"></div>
+            <div class="swatch-name">Gray 5</div>
+            <div class="swatch-hex">#AEAEB2</div>
+            <div class="swatch-use">Labels, captions</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#E5E5EA;border:1px solid #D1D1D6;"></div>
+            <div class="swatch-name">Border</div>
+            <div class="swatch-hex">#E5E5EA</div>
+            <div class="swatch-use">Card borders</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#F2F2F7;border:1px solid #E5E5EA;"></div>
+            <div class="swatch-name">Surface</div>
+            <div class="swatch-hex">#F2F2F7</div>
+            <div class="swatch-use">Highlight, bg</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#FFFFFF;border:1px solid #E5E5EA;"></div>
+            <div class="swatch-name">White</div>
+            <div class="swatch-hex">#FFFFFF</div>
+            <div class="swatch-use">Card, popover</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#34C759;"></div>
+            <div class="swatch-name">Success</div>
+            <div class="swatch-hex">#34C759</div>
+            <div class="swatch-use">Undo pill, done</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#FF3B30;"></div>
+            <div class="swatch-name">Error</div>
+            <div class="swatch-hex">#FF3B30</div>
+            <div class="swatch-use">Error toast</div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-box" style="background:#FF9F0A;"></div>
+            <div class="swatch-name">Warning</div>
+            <div class="swatch-hex">#FF9F0A</div>
+            <div class="swatch-use">Warn toast</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 3. TYPOGRAPHY ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <span class="section-title">Typography Scale — DM Sans</span>
+      </div>
+      <div class="card">
+        <div class="type-row" style="border-top:1px solid var(--gray-8);padding-top:16px;">
+          <div class="type-meta">Title<br>26px / 700<br>−0.03em</div>
+          <div style="font-size:26px;font-weight:700;letter-spacing:-.03em;color:var(--black);">Tonal Design System
+          </div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">Section<br>20px / 600<br>−0.02em</div>
+          <div style="font-size:20px;font-weight:600;letter-spacing:-.02em;color:var(--black);">The Pill Component</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">Body<br>14px / 400<br>0em</div>
+          <div style="font-size:14px;font-weight:400;color:var(--black);line-height:1.6;">Type your message normally.
+            Tonal rewrites it with the right tone — casual, professional, or formal. Click Undo to restore.</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">Body small<br>13px / 400<br>0em</div>
+          <div style="font-size:13px;font-weight:400;color:var(--black);">Work Chat — friendly but clear. How a normal
+            person talks to a colleague they like.</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">Label<br>11px / 600<br>+0.06em</div>
+          <div
+            style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gray-4);">
+            Default Tone</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta">Caption<br>10px / 500<br>+0.08em</div>
+          <div
+            style="font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-5);">
+            Platform Selectors</div>
+        </div>
+        <div class="type-row" style="border-bottom:none;">
+          <div class="type-meta">Mono<br>11px / 400<br>DM Mono</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--gray-3);">.ql-editor[contenteditable="true"]
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 4. SPACING ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <span class="section-title">Spacing Scale</span>
+      </div>
+      <div class="card">
+        <div class="spacing-row">
+          <div class="spacing-item">
+            <div class="spacing-bar" style="width:4px;"></div>
+            <div class="spacing-label">4 — sp-1</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="width:8px;"></div>
+            <div class="spacing-label">8 — sp-2</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="width:12px;"></div>
+            <div class="spacing-label">12 — sp-3</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="width:16px;"></div>
+            <div class="spacing-label">16 — sp-4</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="width:20px;"></div>
+            <div class="spacing-label">20 — sp-5</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="width:24px;"></div>
+            <div class="spacing-label">24 — sp-6</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="width:32px;"></div>
+            <div class="spacing-label">32 — sp-7</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="width:48px;"></div>
+            <div class="spacing-label">48 — sp-8</div>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-bar" style="width:64px;"></div>
+            <div class="spacing-label">64 — sp-9</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 5. THE PILL ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <span class="section-title">The Tonal Pill — All States</span>
+      </div>
+      <div class="card">
+        <div class="pill-grid" style="grid-template-columns:repeat(7,auto);">
+
+          <!-- Rest -->
+          <div class="pill-item">
+            <div class="t-pill t-pill--rest">
+              <svg width="13" height="8" viewBox="0 0 72 44" fill="none">
+                <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+                <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+                <circle cx="39" cy="22" r="15" fill="white" />
+                <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+              </svg>
+            </div>
+            <div class="pill-label">Rest</div>
+          </div>
+
+          <!-- Hover -->
+          <div class="pill-item">
+            <div class="t-pill t-pill--hover">
+              <svg width="13" height="8" viewBox="0 0 72 44" fill="none">
+                <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+                <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+                <circle cx="39" cy="22" r="15" fill="white" />
+                <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+              </svg>
+            </div>
+            <div class="pill-label">Hover</div>
+          </div>
+
+          <!-- Expanded (clicked once) -->
+          <div class="pill-item">
+            <div class="t-pill t-pill--expanded">
+              <svg width="11" height="7" viewBox="0 0 72 44" fill="none">
+                <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+                <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+                <circle cx="39" cy="22" r="15" fill="white" />
+                <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+              </svg>
+              <span class="pill-text">Work Chat</span>
+              <svg width="7" height="5" viewBox="0 0 8 5" fill="none" style="opacity:.6">
+                <path d="M1 1l3 3 3-3" stroke="white" stroke-width="1.3" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="pill-label">Expanded</div>
+          </div>
+
+          <!-- Loading -->
+          <div class="pill-item">
+            <div class="t-pill t-pill--loading">
+              <span class="pill-text pill-dots">Converting</span>
+            </div>
+            <div class="pill-label">Loading</div>
+          </div>
+
+          <!-- Done -->
+          <div class="pill-item">
+            <div class="t-pill t-pill--done">
+              <span class="pill-text">Undo</span>
+            </div>
+            <div class="pill-label">Done</div>
+          </div>
+
+          <!-- Error -->
+          <div class="pill-item">
+            <div class="t-pill t-pill--error">
+              <span class="pill-text">Failed</span>
+            </div>
+            <div class="pill-label">Error</div>
+          </div>
+
+          <!-- With open popover -->
+          <div class="pill-item" style="align-items:flex-end;margin-left:16px;">
+            <div class="popover">
+              <div class="pop-item">
+                <span class="pop-label">Casual</span>
+                <span class="pop-sub">texting</span>
+              </div>
+              <div class="pop-divider"></div>
+              <div class="pop-item pop-item--active">
+                <span class="pop-label">Work Chat</span>
+                <span class="pop-check">✓</span>
+              </div>
+              <div class="pop-divider"></div>
+              <div class="pop-item">
+                <span class="pop-label">Formal</span>
+                <span class="pop-sub">professional</span>
+              </div>
+            </div>
+            <div style="width:1px;height:8px;background:var(--black);margin:0 auto;"></div>
+            <div class="t-pill t-pill--rest" style="box-shadow:0 0 0 2px rgba(0,0,0,.1);">
+              <svg width="13" height="8" viewBox="0 0 72 44" fill="none">
+                <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+                <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+                <circle cx="39" cy="22" r="15" fill="white" />
+                <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+              </svg>
+            </div>
+            <div class="pill-label">Popover open</div>
+          </div>
+
+        </div>
+
+        <!-- Size spec -->
+        <div
+          style="margin-top:24px;padding-top:16px;border-top:1px solid var(--gray-8);display:flex;gap:24px;flex-wrap:wrap;">
+          <div style="font-size:12px;color:var(--gray-4);"><span
+              style="color:var(--black);font-weight:600;">Rest:</span> 30×16px</div>
+          <div style="font-size:12px;color:var(--gray-4);"><span
+              style="color:var(--black);font-weight:600;">Expanded:</span> auto×24px · 9px h-padding</div>
+          <div style="font-size:12px;color:var(--gray-4);"><span
+              style="color:var(--black);font-weight:600;">Done/Error:</span> auto×24px · green/red bg</div>
+          <div style="font-size:12px;color:var(--gray-4);"><span style="color:var(--black);font-weight:600;">Pill
+              text:</span> 10px / 700 / white</div>
+          <div style="font-size:12px;color:var(--gray-4);"><span
+              style="color:var(--black);font-weight:600;">z-index:</span> 9999</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 6. PLATFORM MOCKUPS ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <span class="section-title">In Use — Platform Mockups</span>
+      </div>
+      <div class="g2" style="gap:28px;">
+
+        <!-- WHATSAPP - at rest -->
+        <div>
+          <div class="mockup-cap">WhatsApp Web — at rest</div>
+          <div class="wa">
+            <div class="wa-head">
+              <div class="wa-av">R</div>
+              <div>
+                <div class="wa-nm">Rahul Sharma</div>
+                <div class="wa-st">online</div>
+              </div>
+            </div>
+            <div class="wa-chat">
+              <div class="wa-bub wa-bub-in">hey when's the meeting?<span class="wa-ts">10:32</span></div>
+              <div class="wa-bub wa-bub-out">I'll confirm after checking<span class="wa-ts">10:34 ✓✓</span></div>
+            </div>
+            <div class="wa-bar">
+              <div class="wa-emoji-btn">😊</div>
+              <div class="wa-field">
+                <span class="wa-field-text" style="color:#9CA3AF;">hey when is the meeting confirmed</span>
+                <!-- TONAL PILL — inside input, right side, vertically centered -->
+                <div class="in-pill" style="width:26px;height:14px;">
+                  <svg width="12" height="7" viewBox="0 0 72 44" fill="none">
+                    <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+                    <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+                    <circle cx="39" cy="22" r="15" fill="white" />
+                    <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+                  </svg>
+                </div>
+              </div>
+              <div class="wa-send">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M2 12L22 4 14 22 12 13 2 12Z" fill="white" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WHATSAPP - popover -->
+        <div>
+          <div class="mockup-cap">WhatsApp Web — popover open</div>
+          <div class="wa">
+            <div class="wa-head">
+              <div class="wa-av">R</div>
+              <div>
+                <div class="wa-nm">Rahul Sharma</div>
+                <div class="wa-st">online</div>
+              </div>
+            </div>
+            <div class="wa-chat">
+              <div class="wa-bub wa-bub-in">hey when's the meeting?<span class="wa-ts">10:32</span></div>
+              <!-- popover floats above pill -->
+              <div style="display:flex;justify-content:flex-end;padding-right:46px;">
+                <div class="popover">
+                  <div class="pop-item"><span class="pop-label">Casual</span><span class="pop-sub">texting</span></div>
+                  <div class="pop-divider"></div>
+                  <div class="pop-item pop-item--active"><span class="pop-label">Work Chat</span><span
+                      class="pop-check">✓</span></div>
+                  <div class="pop-divider"></div>
+                  <div class="pop-item"><span class="pop-label">Formal</span><span class="pop-sub">professional</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="wa-bar">
+              <div class="wa-emoji-btn">😊</div>
+              <div class="wa-field">
+                <span class="wa-field-text">hey when is the meeting confirmed</span>
+                <div class="in-pill" style="width:26px;height:14px;box-shadow:0 0 0 2px rgba(0,0,0,.12);">
+                  <svg width="12" height="7" viewBox="0 0 72 44" fill="none">
+                    <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+                    <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+                    <circle cx="39" cy="22" r="15" fill="white" />
+                    <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+                  </svg>
+                </div>
+              </div>
+              <div class="wa-send"><svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M2 12L22 4 14 22 12 13 2 12Z" fill="white" />
+                </svg></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLACK - at rest -->
+        <div>
+          <div class="mockup-cap">Slack (browser) — at rest</div>
+          <div class="sl">
+            <div class="sl-head">
+              <span class="sl-hash">#</span>
+              <span class="sl-chan">general</span>
+            </div>
+            <div class="sl-msgs">
+              <div class="sl-msg">
+                <div class="sl-av" style="background:#E01E5A;">P</div>
+                <div>
+                  <div class="sl-msg-meta">Priya <span>10:14 AM</span></div>
+                  <div class="sl-msg-text">hey team can someone share the Q3 deck?</div>
+                </div>
+              </div>
+            </div>
+            <div class="sl-compose-area">
+              <div class="sl-compose">
+                <div class="sl-compose-top">
+                  <span class="sl-compose-placeholder">Message #general</span>
+                </div>
+                <div class="sl-compose-toolbar">
+                  <div class="sl-toolbar-icon">B</div>
+                  <div class="sl-toolbar-icon" style="font-style:italic;">I</div>
+                  <div class="sl-toolbar-icon" style="text-decoration:underline;">U</div>
+                  <div class="sl-toolbar-icon">≡</div>
+                  <div class="sl-toolbar-icon">🔗</div>
+                  <!-- TONAL PILL in Slack sits left of send in bottom toolbar -->
+                  <div class="in-pill" style="width:24px;height:13px;margin-left:auto;margin-right:6px;">
+                    <svg width="11" height="7" viewBox="0 0 72 44" fill="none">
+                      <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+                      <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+                      <circle cx="39" cy="22" r="15" fill="white" />
+                      <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+                    </svg>
+                  </div>
+                  <div class="sl-send">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                      <path d="M3 12L21 4 13 22 11 13 3 12Z" fill="white" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GMAIL - at rest -->
+        <div>
+          <div class="mockup-cap">Gmail compose — at rest</div>
+          <div class="gm">
+            <div class="gm-head">
+              <span class="gm-title">New Message</span>
+              <span class="gm-close">✕</span>
+            </div>
+            <div class="gm-field">
+              <span class="gm-field-label" style="color:#5f6368;">To</span>
+              <span class="gm-field-val">priya@company.com</span>
+            </div>
+            <div class="gm-field">
+              <span class="gm-field-label" style="color:#5f6368;">Subj</span>
+              <span class="gm-field-val">Q3 deliverables update</span>
+            </div>
+            <div class="gm-body" style="color:#9CA3AF;">hey can u update me on that thing we discussed</div>
+            <div class="gm-footer">
+              <button class="gm-send">Send</button>
+              <div class="gm-toolbar-icon">B</div>
+              <div class="gm-toolbar-icon" style="font-style:italic;">I</div>
+              <div class="gm-toolbar-icon">≡</div>
+              <div class="gm-toolbar-icon">🔗</div>
+              <!-- TONAL PILL in Gmail sits in the footer toolbar, right side before trash -->
+              <div class="in-pill" style="width:24px;height:13px;margin-left:auto;">
+                <svg width="11" height="7" viewBox="0 0 72 44" fill="none">
+                  <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+                  <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+                  <circle cx="39" cy="22" r="15" fill="white" />
+                  <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+                </svg>
+              </div>
+              <div class="gm-toolbar-icon">🗑</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LINKEDIN - at rest -->
+        <div>
+          <div class="mockup-cap">LinkedIn Messages — at rest</div>
+          <div class="li">
+            <div class="li-head">
+              <div class="li-av">P</div>
+              <div>
+                <div class="li-nm">Priya Mehta · 2nd</div>
+                <div class="li-role">Product Manager at Razorpay</div>
+              </div>
+            </div>
+            <div class="li-msgs">
+              <div class="li-bub li-bub-in">I wanted to circle back on the deliverables from last week's sync. Could you
+                advise on the timeline moving forward?</div>
+            </div>
+            <div class="li-input-area">
+              <div class="li-field" style="color:#9CA3AF;">
+                Write a message…
+                <div class="in-pill"
+                  style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:24px;height:13px;">
+                  <svg width="11" height="7" viewBox="0 0 72 44" fill="none">
+                    <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+                    <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+                    <circle cx="39" cy="22" r="15" fill="white" />
+                    <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="li-bottom-bar">
+              <div class="gm-toolbar-icon">😊</div>
+              <div class="gm-toolbar-icon">📎</div>
+              <button class="li-send">Send</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LINKEDIN - after conversion -->
+        <div>
+          <div class="mockup-cap">LinkedIn Messages — after conversion (with highlight)</div>
+          <div class="li">
+            <div class="li-head">
+              <div class="li-av">P</div>
+              <div>
+                <div class="li-nm">Priya Mehta · 2nd</div>
+                <div class="li-role">Product Manager at Razorpay</div>
+              </div>
+            </div>
+            <div class="li-msgs">
+              <div class="li-bub li-bub-in">I wanted to circle back on the deliverables. Could you advise on the
+                timeline?</div>
+            </div>
+            <div class="li-input-area">
+              <div class="li-field"
+                style="color:var(--black);align-items:flex-start;padding-top:10px;padding-bottom:10px;height:auto;">
+                <span style="font-size:13px;line-height:1.5;">Thanks for following up. <span class="hl">I'll review the
+                    deliverables</span> and <span class="hl">share a timeline</span> by end of week.</span>
+                <!-- Undo pill on done state -->
+                <div class="in-pill"
+                  style="position:absolute;right:10px;top:10px;width:auto;height:18px;padding:0 8px;background:var(--green);">
+                  <span style="font-size:9px;font-weight:700;color:white;font-family:var(--font);">Undo</span>
+                </div>
+              </div>
+            </div>
+            <div class="li-bottom-bar">
+              <div class="gm-toolbar-icon">😊</div>
+              <div class="gm-toolbar-icon">📎</div>
+              <button class="li-send">Send</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 7. HIGHLIGHT ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <span class="section-title">Text Highlight — Before / After</span>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-label">Before — user typed</div>
+          <div class="ba-field">
+            hey can u let me know whats the status on that thing and when its gonna be done
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+            <div class="in-pill" style="width:24px;height:13px;"><svg width="11" height="7" viewBox="0 0 72 44"
+                fill="none">
+                <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+                <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+                <circle cx="39" cy="22" r="15" fill="white" />
+                <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+              </svg></div>
+            <span style="font-size:12px;color:var(--gray-4);">Click → Work Chat selected</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">After — Tonal rewrites, highlights changes</div>
+          <div class="ba-field ba-field--after" style="position:relative;">
+            <span class="hl">Could you</span> please provide an <span class="hl">update on the status</span> and <span
+              class="hl">expected completion date</span> for this?
+            <div class="undo-pill">Undo</div>
+          </div>
+          <div style="margin-top:12px;font-size:11px;color:var(--gray-5);line-height:1.5;">
+            Changed words get <strong style="color:var(--black);">#F2F2F7 background</strong> for 3 seconds then fade.
+            User sees exactly what shifted.
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 8. DECODE FLOW ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <span class="section-title">Decode Flow — Select → Button → Card</span>
+      </div>
+      <div class="g3">
+
+        <!-- Step 1: select text -->
+        <div class="card">
+          <div class="card-label">Step 1 — User selects formal text</div>
+          <div
+            style="font-size:13px;color:var(--black);line-height:1.6;background:var(--gray-9);padding:12px;border-radius:var(--r-md);border:1px solid var(--gray-7);">
+            <span style="background:#B4D5FF;border-radius:3px;padding:1px 2px;">I wanted to circle back and ensure all
+              stakeholders are aligned on the deliverables with respect to the Q3 initiative moving forward.</span>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--gray-5);">Selected 20+ chars → floating button appears
+          </div>
+        </div>
+
+        <!-- Step 2: floating button -->
+        <div class="card"
+          style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+          <div class="card-label" style="text-align:center;">Step 2 — Decode button appears</div>
+          <div style="font-size:13px;color:var(--gray-3);line-height:1.6;text-align:center;padding:0 8px;">...moving
+            forward.</div>
+          <div class="decode-float">Decode</div>
+          <div style="font-size:11px;color:var(--gray-5);text-align:center;">Floats near cursor. Dark pill, white text.
+          </div>
+        </div>
+
+        <!-- Step 3: decode card -->
+        <div class="card"
+          style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;">
+          <div class="card-label" style="text-align:center;">Step 3 — Result card & Copied state</div>
+
+          <!-- Default state -->
+          <div class="decode-card">
+            <div class="decode-card-header">
+              <span class="decode-card-tag">Plain English</span>
+              <div class="decode-card-close">✕</div>
+            </div>
+            <div class="decode-card-body">
+              <div class="decode-card-text">What's the update on the Q3 project? Are we all on the same page about what
+                needs to be delivered?</div>
+              <div class="decode-card-copy">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy
+              </div>
+            </div>
+          </div>
+
+          <!-- Copied state -->
+          <div class="decode-card">
+            <div class="decode-card-header">
+              <span class="decode-card-tag">Plain English</span>
+              <div class="decode-card-close">✕</div>
+            </div>
+            <div class="decode-card-body">
+              <div class="decode-card-text">What's the update on the Q3 project? Are we all on the same page about what
+                needs to be delivered?</div>
+              <div class="decode-card-copy decode-card-copy--copied">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+                Copied!
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 9. TOASTS ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">09</span>
+        <span class="section-title">Toast Notifications</span>
+      </div>
+      <div class="card">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <div class="toast toast--success">
+              <div class="toast-dot toast-dot--success"></div>Converted
+            </div>
+            <div class="pill-label">Success</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <div class="toast toast--error">
+              <div class="toast-dot toast-dot--error"></div>Check your internet
+            </div>
+            <div class="pill-label">Error</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <div class="toast toast--warn">
+              <div class="toast-dot toast-dot--warn"></div>Type something first
+            </div>
+            <div class="pill-label">Warning</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <div class="toast toast--info">
+              <div class="toast-dot toast-dot--info"></div>Settings updated
+            </div>
+            <div class="pill-label">Info</div>
+          </div>
+        </div>
+        <div style="margin-top:16px;font-size:12px;color:var(--gray-4);">
+          Position: <strong style="color:var(--black);">fixed, bottom-center</strong> · Shape: <strong
+            style="color:var(--black);">pill / 100px radius</strong> · BG: always <strong
+            style="color:var(--black);">#0F0F0F</strong> · Coloured text only · Auto-dismiss 3s · Fade transition
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 10. EXTENSION POPUP ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">10</span>
+        <span class="section-title">Extension Popup</span>
+      </div>
+      <div style="display:flex;gap:32px;align-items:flex-start;">
+        <div class="popup-shell">
+          <div class="popup-head">
+            <div class="popup-logo">
+              <svg width="20" height="12" viewBox="0 0 72 44" fill="none">
+                <rect x="0" y="18" width="72" height="8" rx="4" fill="#2C2C2E" />
+                <rect x="0" y="18" width="39" height="8" rx="4" fill="#FFFFFF" />
+                <circle cx="39" cy="22" r="14" fill="white" />
+                <circle cx="39" cy="22" r="8" fill="#0F0F0F" />
+              </svg>
+            </div>
+            <div>
+              <div class="popup-title">Tonal</div>
+              <div class="popup-sub">Two-way tone translator</div>
+            </div>
+          </div>
+          <div class="popup-body">
+            <div class="popup-badge">
+              <div class="popup-badge-dot"></div>
+              Ready to use — no setup needed
+            </div>
+            <div class="popup-field-label">Default tone</div>
+            <div class="segmented" style="margin-bottom:16px;">
+              <div class="seg-item">Casual</div>
+              <div class="seg-item seg-item--active">Work</div>
+              <div class="seg-item">Formal</div>
+            </div>
+            <button class="popup-save">Save preference</button>
+          </div>
+          <div class="popup-footer">
+            <div class="popup-platforms">
+              <span class="platform-tag">Gmail</span>
+              <span class="platform-tag">Slack</span>
+              <span class="platform-tag">LinkedIn</span>
+              <span class="platform-tag">WhatsApp</span>
+            </div>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--gray-5);">v2.0</span>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13px;color:var(--black);font-weight:600;margin-bottom:12px;">Popup notes</div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--gray-4);line-height:1.6;">
+            <div>Width: <strong style="color:var(--black);">280px</strong> fixed. Height: auto.</div>
+            <div>No API key input — key lives on the Cloudflare Worker server.</div>
+            <div>Green badge always visible — "Ready to use, no setup needed".</div>
+            <div>Segmented control saves the user's default tone preference.</div>
+            <div>Platform tags in footer for instant clarity on where it works.</div>
+            <div>Version number bottom-right in monospace.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 11. MOTION ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">11</span>
+        <span class="section-title">Motion & Timing Tokens</span>
+      </div>
+      <div class="card">
+        <div class="motion-row">
+          <div class="motion-item" style="border-top:1px solid var(--gray-8);padding-top:16px;">
+            <div class="motion-name">ease-out</div>
+            <div class="motion-dur">150ms</div>
+            <div class="motion-curve">cubic-bezier(0.2, 0, 0, 1)</div>
+            <div class="motion-use">Pill hover, card hover, popover open</div>
+          </div>
+          <div class="motion-item">
+            <div class="motion-name">ease-spring</div>
+            <div class="motion-dur">200ms</div>
+            <div class="motion-curve">cubic-bezier(0.34, 1.56, 0.64, 1)</div>
+            <div class="motion-use">Toast entrance, decode card appear</div>
+          </div>
+          <div class="motion-item">
+            <div class="motion-name">fade-out</div>
+            <div class="motion-dur">300ms</div>
+            <div class="motion-curve">ease</div>
+            <div class="motion-use">Toast exit, highlight fade at 3s mark</div>
+          </div>
+          <div class="motion-item">
+            <div class="motion-name">pill-scale</div>
+            <div class="motion-dur">100ms</div>
+            <div class="motion-curve">ease</div>
+            <div class="motion-use">Pill press (active: scale 0.97)</div>
+          </div>
+          <div class="motion-item" style="border-bottom:none;">
+            <div class="motion-name">pulse-load</div>
+            <div class="motion-dur">1.4s ∞</div>
+            <div class="motion-curve">ease-in-out</div>
+            <div class="motion-use">Loading state opacity pulse 1→0.3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 12. SHADOW SCALE ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">12</span>
+        <span class="section-title">Shadow Scale</span>
+      </div>
+      <div class="g4">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div style="width:80px;height:80px;background:white;border-radius:var(--r-lg);box-shadow:var(--sh-xs);"></div>
+          <div style="text-align:center;">
+            <div class="icon-label">sh-xs</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--gray-5);margin-top:3px;">0 1px 2px .06</div>
+            <div style="font-size:11px;color:var(--gray-4);margin-top:3px;">Pill default</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div style="width:80px;height:80px;background:white;border-radius:var(--r-lg);box-shadow:var(--sh-sm);"></div>
+          <div style="text-align:center;">
+            <div class="icon-label">sh-sm</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--gray-5);margin-top:3px;">0 4px 12px .06</div>
+            <div style="font-size:11px;color:var(--gray-4);margin-top:3px;">Card default</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div style="width:80px;height:80px;background:white;border-radius:var(--r-lg);box-shadow:var(--sh-md);"></div>
+          <div style="text-align:center;">
+            <div class="icon-label">sh-md</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--gray-5);margin-top:3px;">0 12px 32px .08</div>
+            <div style="font-size:11px;color:var(--gray-4);margin-top:3px;">Platform mockup</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div style="width:80px;height:80px;background:white;border-radius:var(--r-lg);box-shadow:var(--sh-lg);"></div>
+          <div style="text-align:center;">
+            <div class="icon-label">sh-lg</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--gray-5);margin-top:3px;">0 24px 64px .12</div>
+            <div style="font-size:11px;color:var(--gray-4);margin-top:3px;">Popover, decode card</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 13. ERROR STATES ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">13</span>
+        <span class="section-title">Error States & Copy</span>
+      </div>
+      <div class="card">
+        <div class="error-table">
+          <div class="error-row" style="border-top:1px solid var(--gray-8);padding-top:12px;">
+            <div class="error-code">NO_TEXT</div>
+            <div class="error-msg">Type something first</div>
+            <div class="error-note">Triggered when input is empty or &lt;5 chars</div>
+          </div>
+          <div class="error-row">
+            <div class="error-code">AI_FAILED</div>
+            <div class="error-msg">Couldn't rewrite this</div>
+            <div class="error-note">Gemini returned empty or bad response</div>
+          </div>
+          <div class="error-row">
+            <div class="error-code">NETWORK_ERROR</div>
+            <div class="error-msg">Check your internet</div>
+            <div class="error-note">Fetch to Worker failed</div>
+          </div>
+          <div class="error-row">
+            <div class="error-code">SERVER_ERROR</div>
+            <div class="error-msg">Something went wrong</div>
+            <div class="error-note">Worker returned 5xx</div>
+          </div>
+          <div class="error-row">
+            <div class="error-code">TEXT_TOO_SHORT</div>
+            <div class="error-msg">Select more text to decode</div>
+            <div class="error-note">Decode triggered on &lt;20 chars</div>
+          </div>
+          <div class="error-row" style="border-bottom:none;padding-bottom:0;">
+            <div class="error-code">RATE_LIMIT</div>
+            <div class="error-msg">Wait a moment and try again</div>
+            <div class="error-note">Worker returns 429 from Gemini</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 14. PLATFORM SELECTORS ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">14</span>
+        <span class="section-title">DOM Selectors by Platform</span>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-label">Gmail</div>
+          <code>div[aria-label="Message Body"]</code>
+          <code>.Am.Al.editable</code>
+          <code>[role="textbox"][g_editable="true"]</code>
+          <div style="margin-top:10px;font-size:12px;color:var(--gray-4);">Pill position: footer toolbar, before trash
+            icon. Use <code style="display:inline;padding:1px 4px;font-size:11px;">.btC</code> as anchor.</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Slack (browser)</div>
+          <code>.ql-editor[contenteditable="true"]</code>
+          <code>[data-lexical-editor="true"]</code>
+          <code>.p-rich_text_input__editable</code>
+          <div style="margin-top:10px;font-size:12px;color:var(--gray-4);">Pill position: bottom action bar, before
+            <code style="display:inline;padding:1px 4px;font-size:11px;">[data-qa="texty_send_button"]</code>.</div>
+        </div>
+        <div class="card">
+          <div class="card-label">WhatsApp Web</div>
+          <code>div[contenteditable="true"][data-tab="10"]</code>
+          <code>div[contenteditable="true"][title="Type a message"]</code>
+          <code>[data-testid="conversation-compose-box-input"]</code>
+          <div style="margin-top:10px;font-size:12px;color:var(--gray-4);">Pill position: absolute inside input wrapper.
+            position:relative on parent. right:8px, top:50%, translateY(-50%).</div>
+        </div>
+        <div class="card">
+          <div class="card-label">LinkedIn</div>
+          <code>.msg-form__contenteditable</code>
+          <code>div[aria-label="Write a message…"][contenteditable]</code>
+          <code>.msg-form__msg-content-container [contenteditable]</code>
+          <div style="margin-top:10px;font-size:12px;color:var(--gray-4);">Pill position: bottom actions row, before
+            <code style="display:inline;padding:1px 4px;font-size:11px;">button.msg-form__send-button</code>.</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════ 15. SKELETON & COACH MARK ═══════════════════════════ -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">15</span>
+        <span class="section-title">Loading Skeleton & First-Run Coach Mark</span>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-label">Skeleton — while page loads</div>
+          <div style="padding:16px;background:var(--gray-9);border-radius:var(--r-md);border:1px solid var(--gray-7);">
+            <div class="skeleton" style="width:48px;height:8px;margin-bottom:14px;opacity:.5;"></div>
+            <div class="skeleton" style="width:100%;height:11px;margin-bottom:8px;opacity:.4;"></div>
+            <div class="skeleton" style="width:85%;height:11px;margin-bottom:8px;opacity:.4;"></div>
+            <div class="skeleton" style="width:60%;height:11px;margin-bottom:16px;opacity:.4;"></div>
+            <div class="skeleton" style="width:100%;height:28px;border-radius:var(--r-md);opacity:.35;"></div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--gray-5);">Shown for max 3s while MutationObserver finds
+            the input. Shimmer left-to-right.</div>
+        </div>
+        <div class="card"
+          style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:180px;">
+          <div class="card-label" style="text-align:center;">Coach Mark — first time user</div>
+          <div class="coach-mark">Shift the tone here ↓</div>
+          <div class="t-pill t-pill--rest">
+            <svg width="13" height="8" viewBox="0 0 72 44" fill="none">
+              <rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C" />
+              <rect x="0" y="18" width="39" height="8" rx="4" fill="white" />
+              <circle cx="39" cy="22" r="15" fill="white" />
+              <circle cx="39" cy="22" r="9" fill="#0F0F0F" />
+            </svg>
+          </div>
+          <div style="font-size:11px;color:var(--gray-5);text-align:center;">Shown once on first inject. Dismissed on
+            any click.</div>
+        </div>
+      </div>
+    </div>
+
+
+  </div><!-- end .page -->
+</body>
+
+</html>

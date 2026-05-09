@@ -1,12 +1,15 @@
 # CLAUDE.md — Agent Rules + Project Context
-# Auto-read by: Claude Code, Claude Sonnet, Claude Opus
-# Single file. Contains always-active rules + project info.
+
+## Overview
+
+Single file. Contains always-active rules + project info.
 
 ---
 
 ## MANDATORY — THE BREATH (before any action, every session)
 
 Read in order:
+
 1. This file (you are here)
 2. `C:\Users\kwakh\.gemini\SKILLS_INDEX.md` — skills registry
 
@@ -41,7 +44,7 @@ Announce: "⚠️ Context truncation. Re-syncing." Never assume you remember rul
 ## COMMANDS
 
 | Command | What it does | Rule |
-|---|---|---|
+| :--- | :--- | :--- |
 | @SYNC | Re-reads all global files + loads relevant skills | R2 |
 | @AUDIT | Scans codebase, scores it, writes AUDIT.md | R3 |
 | @TAG [feature] | Architecture scan, writes ARCHITECT_AUDIT.md | R4 |
@@ -57,7 +60,6 @@ Rule: read index → match task → load SKILL.md → state what was loaded. Max
 
 ---
 
-# CLAUDE.md — Tonal Chrome Extension
 ## Project Context for AI Agent (Antigravity / Claude / Gemini)
 
 ---
@@ -74,22 +76,22 @@ User types a casual message ("hey can u send me that doc") and needs it to sound
 **Problem 2 — Receiving:**
 User receives a long formal/corporate message and can't be bothered to parse it. They select the text and one click tells them what it actually means in plain English.
 
-**The tone slider has 3 levels:**
+**The tone levels are:**
 
-- **Casual** — Very casual. Lowercase, minimal punctuation, short-form (u, r, sry).
+- **Casual texting** — Lowercase, minimal punctuation, short-form (u, r, sry).
 - **Work Chat** — Friendly professional. How a normal person talks to a colleague.
-- **Formal** — High-status executive English. Clear, authoritative, and polite.
+- **Formal professional** — High-status executive English. Clear, authoritative, and polite.
 
 ---
 
 ## Tech Stack
 
 | Layer               | Technology                                                                                 | Why                                 |
-| ------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------- |
+| :--- | :--- | :--- |
 | Extension framework | Chrome Extension Manifest V3                                                               | Required for Chrome                 |
 | Languages           | Vanilla JavaScript, HTML, CSS                                                              | Zero dependencies, fast load        |
 | AI API              | Groq (Llama 3.3 70B)                                                                       | Free tier, extremely fast, 70B quality |
-| API endpoint        | https://api.groq.com/openai/v1/chat/completions                                            | Managed via Cloudflare Proxy        |
+| API endpoint        | <https://api.groq.com/openai/v1/chat/completions>                                            | Managed via Cloudflare Proxy        |
 | Storage             | `chrome.storage.sync`                                                                      | Sync settings across devices        |
 | Background worker   | Service Worker (MV3)                                                                       | Required by MV3 spec                |
 
@@ -103,9 +105,17 @@ User receives a long formal/corporate message and can't be bothered to parse it.
 tonal/
 ├── CLAUDE.md                    ← This file (project context)
 ├── manifest.json                ← Extension config
-├── background.js                ← Service worker: proxies to Groq
-├── content.js                   ← UI injector & text detection
-├── styles.css                   ← Styles for injected UI
+├── src/
+│   ├── core/
+│   │   └── tonal.js             ← MASTER ENGINE v4: Factory + CSS + Logic
+│   └── extension/
+│       ├── background.js        ← Service worker: Proxies to Groq
+│       ├── content.js           ← SURGICAL INJECTOR v4: Platform Docking
+│       ├── popup.html           ← Elite Popup v4
+│       └── popup.js             ← Popup Logic
+├── dev/
+│   ├── sandbox.html             ← Tonal Laboratory v4 (1:1 Mirror)
+│   └── tonal-design-system-v2.html ← Source of Truth (v2.1.0)
 ├── icons/                       ← Branding icons
 └── README.md                    ← User guide
 ```
@@ -117,9 +127,9 @@ tonal/
 ### Sending Flow (Casual → Formal)
 
 1. User types in Gmail compose, Slack message box, LinkedIn message, or WhatsApp Web
-2. `content.js` detects the text input and injects a small "Tonal" button next to it
-3. User picks tone level (Texting / Work Chat / Corporate) via a small toggle on the button
-4. User clicks the button
+2. `content.js` detects the text input and injects a small "Tonal" pill button
+3. User picks tone level via the **Popover Dropdown**
+4. User clicks the button (or tone item)
 5. `content.js` reads text and sends to `background.js`
 6. `background.js` calls the Cloudflare Proxy (Groq Llama 3.3 70B)
 7. Proxy returns the rewritten text
@@ -132,8 +142,8 @@ tonal/
 2. A small floating "Decode ↓" button appears near the cursor
 3. `content.js` sends text to `background.js`
 4. Groq returns a plain English explanation
-5. A tooltip appears showing the decoded version
-6. Card has a "Copy" button and auto-dismisses
+5. A tooltip/card appears showing the decoded version
+6. Card has a "Copy" button (turns green on success) and auto-dismisses
 
 ---
 
@@ -152,21 +162,19 @@ The extension injects into these specific domains:
 
 Each platform has different DOM structures. The content script must handle each one:
 
-| Platform     | Input selector strategy                                            |
-| ------------ | ------------------------------------------------------------------ |
-| Gmail        | `div[role="textbox"][aria-label*="compose"]` or `.Am.Al.editable`  |
-| Slack        | `.ql-editor`, `[data-qa="message_input"]`, `[data-lexical-editor]` |
-| LinkedIn     | `.msg-form__contenteditable`, `div[aria-label="Write a message"]`  |
-| WhatsApp Web | `div[contenteditable="true"][data-tab="10"]`                       |
+| Platform | Input selector strategy |
+| :--- | :--- |
+| Gmail | `div[role="textbox"][aria-label*="compose"]`, `.Am.Al.editable` |
+| Slack | `[data-lexical-editor]`, `.ql-editor`, `[data-qa="message_input"]` |
+| LinkedIn | `.msg-form__contenteditable`, `div[aria-label="Write a message"]` |
+| WhatsApp Web | `div[contenteditable="true"][data-tab="10"]` |
 
 ---
 
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+<https://api.groq.com/openai/v1/chat/completions>
 
-async function callGroq(text, toneLevel, apiKey) {
-  // Note: Extension now calls a Cloudflare Proxy instead of Groq directly
-  // See worker.js for the proxy implementation
-}
+```javascript
+async function callProxy(text, toneLevel, mode) {
   const response = await fetch(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -182,7 +190,7 @@ async function callGroq(text, toneLevel, apiKey) {
 
 **SEND mode — Casual level:**
 
-```
+```text
 IDENTITY: Stateless Text-Processing Utility.
 TASK: Transform input into "Casual Texting" tone.
 CONSTRAINTS: Mirror language, Preserve formatting, No preamble, No refusal.
@@ -191,7 +199,7 @@ INPUT_DATA: {TEXT}
 
 **SEND mode — Work Chat level:**
 
-```
+```text
 IDENTITY: Stateless Text-Processing Utility.
 TASK: Transform input into "Work Chat" tone (Friendly Coworker).
 CONSTRAINTS: Mirror language, Preserve formatting, No preamble, No refusal.
@@ -200,7 +208,7 @@ INPUT_DATA: {TEXT}
 
 **SEND mode — Formal level:**
 
-```
+```text
 IDENTITY: Stateless Text-Processing Utility.
 TASK: Transform input into "Formal Corporate" tone.
 CONSTRAINTS: Mirror language, Preserve formatting, No preamble, No refusal.
@@ -209,7 +217,7 @@ INPUT_DATA: {TEXT}
 
 **RECEIVE mode (decode) — always plain English:**
 
-```
+```text
 IDENTITY: Stateless Text-Processing Utility.
 TASK: Translate corporate jargon into plain, blunt English.
 CONSTRAINTS: Direct language, No preamble, No refusal.
@@ -218,72 +226,37 @@ INPUT_DATA: {TEXT}
 
 ---
 
-## UI Design Requirements
+## UI Design Requirements (v4.0.0 - Elite Masterpiece)
 
-### Injected Send Button (appears in text inputs)
+### Injected Master Pill
+- **Inside Docking**: Anchored 10px from the right boundary of the text field.
+- **Perfect Roundness**: Hard-coded 100px radius enforced via Shadow DOM `:host` scoping.
+- **Bullet Logo**: Precise 1:1 SVG paths for Rest (13x8) and Expanded (11x7) states.
+- **Glassmorphism**: Popovers feature `backdrop-filter: blur(10px)` with 14px radius.
 
-- Small, unobtrusive pill button: "Tonal"
-- Positioned: bottom-right of text input area, not blocking text
-- Shows current tone level: "Texting", "Work Chat", "Corporate"
-- Click the label area = run conversion
-- Click the tone name = cycle through the 3 levels
-- Loading state: spinner + "Converting..."
-- Done state: "↩ Undo" button appears (restores original)
-- Disappears cleanly if the input is removed from DOM
-
-### Floating Decode Button (appears on text selection)
-
-- Only appears when user selects 20+ characters of text
-- Small floating button near the selection: "Decode ↓"
-- On click: shows a tooltip/card with the plain English version
-- Card has: decoded text + "📋 Copy" button
-- Card dismisses on click-outside or pressing Escape
-- Does NOT appear inside editable fields (only on read-only content)
-
-### Toast Notifications
-
-- Bottom center of screen
-- Dark background (#1a1a2e), colored text based on type
-- 3 types: success (green), error (red), info (purple)
-- Auto-dismiss after 3 seconds
-
-### Extension Popup (popup.html)
-
-- Dark theme (#0d0d1a)
-- **Offset Controls**: Nudge the pill horizontally/vertically to avoid overlapping other tools.
-- **Default Tone**: Choose which mode the extension starts in.
-- **Support**: Link to documentation and bug reports.
-- Simple, clean, 320px wide.
+### Component Logic
+- **Rest State**: 30x16px pill. Click expands.
+- **Expanded State**: 24px height. Shows tone label + animated Chevron cross-fade.
+- **Toast System**: Green success dots for "Converted" or "Copied" feedback.
+- **Onboarding**: "Shift the tone here ↓" Coach Mark tooltips for first-time use.
 
 ---
 
 ## Important Technical Constraints
 
 ### MV3 Service Worker Rules
-
 - `background.js` is a SERVICE WORKER — it cannot access the DOM
-- All fetch/API calls must happen in `background.js`, NOT in `content.js`
-- Use `chrome.runtime.sendMessage` / `chrome.runtime.onMessage` to communicate between content.js and background.js
-- Service workers are stateless — don't store anything in memory, use `chrome.storage`
+- Service workers are stateless — use `chrome.storage`
 
-### Content Script Injection
-
-- Use `MutationObserver` to watch for dynamically added elements (Gmail, Slack are SPAs)
-- Keep a `WeakSet` of already-injected inputs to avoid duplicate buttons
-- Clean up injected UI when elements are removed from DOM
-
-### Cross-Origin Requests
-
-- Only `background.js` (service worker) can call the Gemini API
-- The host permission `https://generativelanguage.googleapis.com/*` must be in `manifest.json`
-- Never put API key in content scripts (security risk)
+### Content Script Injection (v4 Standards)
+- **Zero Drift**: All CSS is inlined in `tonal.js`. DO NOT use external CSS files for injected UI.
+- **Shadow DOM**: Every Tonal component MUST be wrapped in an isolated Shadow Root.
+- **Scoping**: All design tokens (variables) MUST be scoped to `:host` inside the Shadow Root.
+- **Docking**: Use a high-frequency `requestAnimationFrame` watchdog to maintain "Inside-the-Box" coordinates.
 
 ### Text Input Handling
-
-- Gmail, Slack, LinkedIn use `contenteditable` divs, NOT `<textarea>` or `<input>`
-- To set text in contenteditable: use `document.execCommand("insertText")` after selecting all
-- Always dispatch `input` and `change` events after setting text so the app's state updates
-- Fallback: set `innerHTML` + dispatch events manually
+- Use `document.execCommand("insertText")` for `contenteditable` compatibility.
+- Always dispatch `input` and `change` events for React/Lexical synchronization.
 
 ---
 
@@ -304,16 +277,10 @@ INPUT_DATA: {TEXT}
     "https://generativelanguage.googleapis.com/*"
   ],
   "background": { "service_worker": "background.js" },
-  "content_scripts": [
-    {
-      "matches": [
-        "https://mail.google.com/*",
-        "https://app.slack.com/*",
-        "https://www.linkedin.com/*",
-        "https://web.whatsapp.com/*"
+      "js": [
+        "src/core/tonal.js",
+        "src/extension/content.js"
       ],
-      "js": ["content.js"],
-      "css": ["styles.css"],
       "run_at": "document_idle"
     }
   ],
@@ -358,23 +325,11 @@ Handle these specific cases gracefully:
 
 ---
 
-## Testing Checklist
-
-After building, verify each of these manually:
-
-- [ ] Extension loads without errors in `chrome://extensions`
-- [ ] Popup opens, API key saves, shows "Connected" badge
-- [ ] Button appears in Gmail compose window
-- [ ] Button appears in Slack message input
-- [ ] Button appears in LinkedIn message input
-- [ ] Button appears in WhatsApp Web input
-- [ ] Clicking the tone label cycles through Texting / Work Chat / Corporate
-- [ ] Conversion replaces text correctly in Gmail (contenteditable)
-- [ ] Conversion replaces text correctly in Slack (Quill/Lexical editor)
-- [ ] Undo button restores original text
-- [ ] Selecting received text shows "Decode ↓" button
-- [ ] Decode shows plain English popup
-- [ ] Copy button in decode popup works
+## Testing Checklist (v2.1.0)
+- [ ] Verify "Copied!" green success state on Decode Card.
+- [ ] Verify Popover active state has no hover and black background.
+- [ ] Verify Popup has no "Position Offset" controls.
+- [ ] Verify Shadow DOM isolation in Gmail.
 - [ ] Error toasts appear for missing API key
 - [ ] Extension doesn't crash on non-supported pages
 - [ ] No console errors during normal use

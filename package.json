@@ -1,10 +1,15 @@
 {
   "name": "tonal",
-  "version": "2.0.0",
-  "description": "The two-way tone translator for the modern web.",
+  "version": "2.1.0",
+  "description": "Two-way tone translator Chrome Extension",
+  "main": "background.js",
   "scripts": {
-    "kill": "npx kill-port 3000 3001 3002 8080",
-    "save": "git add -A && git commit -m \"feat: synchronized documentation and architecture\" && git push",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy worker.js",
+    "dev": "wrangler dev worker.js",
+    "zip": "powershell compress-archive -Path manifest.json, background.js, content.js, styles.css, popup.html, popup.js, utils.js, icons -DestinationPath tonal-v2.1.0.zip",
+    "clean": "npx kill-port 3000 3001 3002 8080"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
   }
 }

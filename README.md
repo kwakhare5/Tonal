@@ -1,121 +1,48 @@
-<div align="center">
+# Tonal Chrome Extension — V2.1.0
 
-<!-- PROJECT LOGO / BANNER -->
-<img src="icons/icon128.png" alt="Tonal Logo" width="128"/>
-<br/>
+Tonal is an "Elite" AI-powered rephrasing engine that shifts the tone of your messages across LinkedIn, Gmail, Slack, and WhatsApp with 1:1 Design System parity.
 
-# Tonal
+## 🛠️ Core Components
 
-### The two-way tone translator for the modern web.
-
-<br/>
-
-<!-- BADGES -->
-[![Javascript](https://img.shields.io/badge/Javascript-ES6+-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://javascript.info)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Platform: Chrome](https://img.shields.io/badge/Platform-Chrome-4285F4?style=flat-square&logo=google-chrome&logoColor=white)](https://chrome.google.com/webstore)
-[![Backend: Cloudflare](https://img.shields.io/badge/Backend-Cloudflare_Workers-F38020?style=flat-square&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
-
-<br/>
-
-<!-- QUICK NAVIGATION LINKS -->
-[📖 Docs](#-features) · [🚀 Quickstart](#-quickstart) · [🐛 Report Bug](https://github.com/kwakhare5/Tonal/issues) · [💡 Request Feature](https://github.com/kwakhare5/Tonal/issues)
-
-</div>
+- **`content.js`**: The main injection engine. Handles platform selectors, DOM mutation, and component logic.
+- **`styles.css`**: The literal Design System v2.1.0 tokens and component styles.
+- **`sandbox.html`**: The hardened operational mirror for rapid iteration and QA.
 
 ---
 
-## 🧩 What is Tonal?
+## 🧪 Developer Sandbox (`sandbox.html`)
 
-Tonal is a **two-way AI tone translator** Chrome extension built with **Vanilla JS** and powered by **Groq AI (Llama 3.3 70B)**.
+The Sandbox is a **Hardened Operational Mirror** for the Tonal interaction engine. It is the primary environment for ensuring visual and functional parity with the master Design System.
 
-It was created to solve **the friction of modern digital communication**. Whether you need to turn a quick "k thanks" into a polished professional response, or you need to "decode" a passive-aggressive corporate email into plain English, Tonal handles it directly inside your chat box. Unlike existing solutions that require expensive subscriptions or clunky copy-pasting, Tonal uses a **Privacy-First AI Pill** that lives right where you type.
+### Why We Have It
+1.  **Isolation**: Test the pill's logic in a clean environment without interference from platform-specific CSS (LinkedIn/Gmail).
+2.  **Rapid Iteration**: Instant feedback on visual changes without the need to reload the extension or refresh live messaging apps.
+3.  **Visual Parity**: 1:1 check against the `tonal-design-system-v2.html` source for dimensions, typography, and shadows.
+4.  **Debugging**: Acts as a diagnostic baseline. If a feature works in the sandbox but fails on a live site, the issue is environmental (selectors/injection).
 
----
-
-## ✅ Features
-
-- ✅ **One-Click Conversion** — Instantly shift between Casual (Texting), Friendly (Work Chat), and Formal (Corporate).
-- ✅ **The Decoder** — Translate corporate jargon and passive-aggressive "Manager-speak" into blunt, plain English.
-- ✅ **Zero-Key Security** — No API keys required from the user. Powered by a secure Cloudflare Worker.
-- ✅ **Privacy-First (Local Masking)** — Automatically redacts PII (emails/phones) locally before AI processing and restores them instantly.
-- ✅ **Ghost-Free Injection** — Uses native browser commands to work seamlessly on Gmail, LinkedIn, Slack, and WhatsApp.
-- ✅ **Apple-Grade Motion** — High-fidelity transitions and glassmorphic materials for a premium experience.
+### Key Features
+- **Platform Simulation**: Includes CSS-accurate mockups for LinkedIn and Gmail message fields.
+- **State Mimicry**: Simulates the full "Rest → Hover → Expanded → Loading → Done" lifecycle using internal JS timeouts.
+- **1:1 Token Rendering**: Uses the exact same CSS variables and structural DOM nodes as the production extension.
 
 ---
 
-## 🏗️ Architecture
+## 🎨 Design System Parity (V2.1.0)
 
-```mermaid
-graph LR
-    A[Content Script] -- 1. Mask PII --> B[Background Service Worker]
-    B -- 2. POST Proxy --> C[Cloudflare Worker AI]
-    C -- 3. Llama 3.1 8B --> B
-    B -- 4. Return Result --> A
-    A -- 5. Unmask PII --> D[Text Editor]
-```
+All components must strictly adhere to the following specifications from Section 05:
 
----
-
-## 🚀 Quickstart
-
-### Prerequisites
-
-- A modern browser (Chrome, Edge, or Brave).
-- A Cloudflare account (for hosting your own AI proxy).
-
-### Installation
-
-```bash
-# 1. Clone the repo
-git clone https://github.com/kwakhare5/Tonal.git
-cd Tonal
-
-# 2. Open Chrome Extensions
-# Visit chrome://extensions/
-
-# 3. Enable Developer Mode
-# Click the toggle in the top-right corner.
-
-# 4. Load Unpacked
-# Select the 'Tonal' folder.
-```
-
-### Configuration (AI Backend)
-
-1. Deploy the `worker.js` file to your **Cloudflare Workers** account: `npm run deploy`.
-2. Copy your Worker's URL (e.g., `https://tonal-proxy.name.workers.dev`).
-3. Open `background.js` and paste your URL into the `WORKER_URL` constant.
-4. Load the extension in Chrome (Developer Mode → Load Unpacked).
-5. Open Gmail, Slack, or LinkedIn and start typing!
+- **Rest State**: `30x16px`. Icon only.
+- **Hover State**: `scale(1.08)` with shadow increase.
+- **Expanded State**: `24px` height. Intrinsic width. `9px` horizontal padding. `5px` internal gap.
+- **Typography**: DM Sans 10px Bold (`700`).
+- **Colors**: Monochrome palette (`#0F0F0F` black, `#FFFFFF` white).
+- **Done State**: Success green (`#34C759`) with soft drop shadow.
 
 ---
 
-## 📁 Project Structure
+## 🚀 Development Workflow
 
-```
-tonal/
-├── manifest.json                # Extension config & permissions
-├── background.js                # AI proxy bridge & messaging
-├── content.js                   # UI injection & input detection
-├── worker.js                    # Cloudflare AI logic (Llama 3.1)
-├── styles.css                   # Premium UI design system
-├── popup.html/js                # Settings & Offset controls
-├── icons/                       # Brand assets
-└── README.md
-```
-
----
-
-## 👤 Author
-
-**Karan Wakhare**
-
-[![GitHub](https://img.shields.io/badge/GitHub-kwakhare5-181717?style=flat-square&logo=github)](https://github.com/kwakhare5)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/kwakhare5)
-
----
-
-<div align="center">
-  <sub>Built with ❤️ for the modern communicator. If this helped you, consider giving it a ⭐!</sub>
-</div>
+1.  **Modify CSS/JS**: Update the core logic or design tokens.
+2.  **Verify in Sandbox**: Open `sandbox.html` in a browser. Ensure the pill behaves and looks exactly like the Design System.
+3.  **Live Test**: Load the extension in Chrome and verify the injection on LinkedIn or Gmail.
+4.  **Ship**: Package the zero-bloat, production-ready build.
