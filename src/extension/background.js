@@ -58,8 +58,6 @@ async function handleAITask(request, sendResponse) {
     timestamp: Date.now()
   };
 
-  console.log('📡 [GATEWAY] Dispatching Task:', { mode, tone: payload.toneLevel });
-
   try {
     const response = await fetchWithRetry(WORKER_URL, {
       method: "POST",
@@ -138,12 +136,10 @@ function recordFailure() {
   if (stats.failures > 5) {
     circuitOpen = true;
     saveState();
-    console.warn('⚠️ [GATEWAY] Circuit Breaker OPENED');
     setTimeout(() => {
       circuitOpen = false;
       stats.failures = 0;
       saveState();
-      console.log('✅ [GATEWAY] Circuit Breaker CLOSED');
     }, 30000); // Wait 30s before trying again
   }
 }
