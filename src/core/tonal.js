@@ -6,7 +6,7 @@
 window.Tonal = (function() {
   const SVGS = {
     REST: `<svg width="13" height="8" viewBox="0 0 72 44" fill="none"><rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C"/><rect x="0" y="18" width="39" height="8" rx="4" fill="white"/><circle cx="39" cy="22" r="15" fill="white"/><circle cx="39" cy="22" r="9" fill="#0F0F0F"/></svg>`,
-    ICON: `<svg width="11" height="7" viewBox="0 0 72 44" fill="none"><rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C"/><rect x="0" y="18" width="39" height="8" rx="4" fill="white"/><circle cx="39" cy="22" r="15" fill="white"/><circle cx="39" cy="22" r="9" fill="#0F0F0F"/></svg>`,
+    ICON: `<svg width="13" height="8" viewBox="0 0 72 44" fill="none"><rect x="0" y="18" width="72" height="8" rx="4" fill="#3A3A3C"/><rect x="0" y="18" width="39" height="8" rx="4" fill="white"/><circle cx="39" cy="22" r="15" fill="white"/><circle cx="39" cy="22" r="9" fill="#0F0F0F"/></svg>`,
     CHEV: `<svg width="7" height="5" viewBox="0 0 8 5" fill="none"><path d="M1 1l3 3 3-3" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
   };
 
@@ -22,16 +22,34 @@ window.Tonal = (function() {
     .t-pill {
       display: inline-flex; align-items: center; justify-content: center;
       background: var(--black); border-radius: 100px; cursor: pointer;
-      box-shadow: var(--sh-xs); transition: all .2s var(--ease);
+      box-shadow: var(--sh-xs); transition: all .24s var(--ease);
       user-select: none; box-sizing: border-box; position: relative;
+      overflow: hidden;
     }
-    .t-pill--rest { width: 30px; height: 16px; }
-    .t-pill--expanded { height: 24px; padding: 0 9px; gap: 5px; }
-    .t-pill--loading { height: 24px; padding: 0 9px; opacity: 0.5; }
-    .t-pill--done { height: 24px; padding: 0 10px; background: var(--green); }
+    .t-pill--rest { width: 30px; height: 16px; padding: 0; }
+    .t-pill--expanded, .t-pill--rest:hover { width: auto; height: 24px; padding: 0 9px; gap: 5px; justify-content: flex-start; }
+    .t-pill--loading { height: 24px; padding: 0 9px; opacity: 0.5; justify-content: flex-start; }
+    .t-pill--done { height: 24px; padding: 0 10px; background: var(--green); justify-content: center; box-shadow: 0 1px 4px rgba(52, 199, 89, .35); }
     
-    .t-label { font-size: 10px; font-weight: 700; color: white; white-space: nowrap; font-family: var(--font); }
-    .t-icon { display: flex; align-items: center; position: relative; width: 10px; height: 10px; }
+    .t-label { 
+      font-size: 10px; font-weight: 700; color: white; white-space: nowrap; 
+      font-family: var(--font); transition: opacity .2s var(--ease);
+    }
+    .t-pill--rest .t-label, .t-pill--rest .t-icon-chev { opacity: 0; width: 0; pointer-events: none; }
+    .t-pill--expanded .t-label, .t-pill--rest:hover .t-label, 
+    .t-pill--expanded .t-icon-chev, .t-pill--rest:hover .t-icon-chev { opacity: 1; width: auto; pointer-events: auto; }
+
+    .t-icon-logo { display: flex; align-items: center; min-width: 10px; height: 10px; }
+    .t-icon-chev { 
+      position: relative; display: flex; align-items: center; justify-content: center; 
+      width: 7px; height: 5px; cursor: pointer;
+      transition: transform .24s var(--ease); 
+    }
+    .t-icon-chev::after {
+      content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
+    }
+    .t-icon-chev:hover { transform: translateY(1px); }
+    .t-pill--popover-open .t-icon-chev { transform: rotate(180deg); }
     
     .popover { 
       position: absolute; bottom: calc(100% + 8px); right: 0;
@@ -83,6 +101,7 @@ window.Tonal = (function() {
     Object.entries(props).forEach(([k, v]) => {
       if (k === 'className') el.className = v;
       else if (k === 'innerHTML') el.innerHTML = v;
+      else if (k === 'textContent') el.textContent = v;
       else if (k.startsWith('on')) el.addEventListener(k.toLowerCase().substring(2), v);
       else el.setAttribute(k, v);
     });
@@ -95,17 +114,17 @@ window.Tonal = (function() {
       const tone = TONES.find(t => t.id === toneId) || TONES[1];
       const pill = h('div', { className: `t-pill t-pill--${state}` });
       
-      if (state === 'rest') pill.innerHTML = SVGS.REST;
-      else if (state === 'expanded') {
-        pill.innerHTML = SVGS.ICON;
-        pill.appendChild(h('span', { className: 't-label', innerHTML: tone.l }));
-        pill.appendChild(h('div', { className: 't-icon', innerHTML: SVGS.CHEV, onclick: (e) => {
+      if (state === 'rest' || state === 'expanded') {
+        pill.appendChild(h('div', { className: 't-icon-logo', innerHTML: SVGS.ICON }));
+        pill.appendChild(h('span', { className: 't-label', textContent: tone.l }));
+        pill.appendChild(h('div', { className: 't-icon-chev', innerHTML: SVGS.CHEV, onclick: (e) => {
           e.stopPropagation(); callbacks.onTogglePopover();
         }}));
-      } else if (state === 'loading') pill.appendChild(h('span', { className: 't-label dots', innerHTML: 'Converting' }));
+      } 
+      else if (state === 'loading') pill.appendChild(h('span', { className: 't-label dots', innerHTML: 'Converting' }));
       else if (state === 'done') pill.appendChild(h('span', { className: 't-label', innerHTML: 'Undo' }));
 
-      pill.onclick = (e) => { if (!e.target.closest('.t-icon')) callbacks.onClick(); };
+      pill.onclick = (e) => { if (!e.target.closest('.t-icon-chev')) callbacks.onClick(); };
       return pill;
     },
 
@@ -118,8 +137,8 @@ window.Tonal = (function() {
           onclick: () => onSelect(t.id) 
         },
           h('div', {}, 
-            h('span', { className: 'pop-label', innerHTML: t.l }), 
-            isActive ? null : h('span', { className: 'pop-sub', innerHTML: t.s })
+            h('span', { className: 'pop-label', textContent: t.l }), 
+            isActive ? null : h('span', { className: 'pop-sub', textContent: t.s })
           ),
           h('div', { className: 'pop-check' }, isActive ? '✓' : '')
         );
@@ -140,6 +159,7 @@ window.Tonal = (function() {
       const s = document.createElement('style'); s.textContent = CSS; shadow.appendChild(s);
     },
 
-    h
+    h,
+    TONES
   };
 })();

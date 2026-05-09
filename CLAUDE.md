@@ -54,6 +54,7 @@ Announce: "⚠️ Context truncation. Re-syncing." Never assume you remember rul
 ---
 
 ## SKILLS (loaded via @SYNC or on demand)
+
 Index: `C:\Users\kwakh\.gemini\SKILLS_INDEX.md`
 Path: `C:\Users\kwakh\.gemini\antigravity\skills\[skill-folder]\SKILL.md`
 Rule: read index → match task → load SKILL.md → state what was loaded. Max 2 per task.
@@ -86,14 +87,14 @@ User receives a long formal/corporate message and can't be bothered to parse it.
 
 ## Tech Stack
 
-| Layer               | Technology                                                                                 | Why                                 |
-| :--- | :--- | :--- |
-| Extension framework | Chrome Extension Manifest V3                                                               | Required for Chrome                 |
-| Languages           | Vanilla JavaScript, HTML, CSS                                                              | Zero dependencies, fast load        |
-| AI API              | Groq (Llama 3.3 70B)                                                                       | Free tier, extremely fast, 70B quality |
-| API endpoint        | <https://api.groq.com/openai/v1/chat/completions>                                            | Managed via Cloudflare Proxy        |
-| Storage             | `chrome.storage.sync`                                                                      | Sync settings across devices        |
-| Background worker   | Service Worker (MV3)                                                                       | Required by MV3 spec                |
+| Layer               | Technology                                         | Why                                    |
+| :------------------ | :------------------------------------------------- | :------------------------------------- |
+| Extension framework | Chrome Extension Manifest V3                       | Required for Chrome                    |
+| Languages           | Vanilla JavaScript, HTML, CSS                      | Zero dependencies, fast load           |
+| AI API              | Groq (Llama 3.3 70B)                               | Free tier, extremely fast, 70B quality |
+| API endpoint        | <https://api.groq.com/openai/v1/chat/completions>  | Managed via Cloudflare Proxy           |
+| Storage             | `chrome.storage.sync`                              | Sync settings across devices           |
+| Background worker   | Service Worker (MV3)                               | Required by MV3 spec                   |
 
 **No npm. No build step. No React. No bundler.** Pure vanilla JS files the browser loads directly.
 
@@ -101,7 +102,7 @@ User receives a long formal/corporate message and can't be bothered to parse it.
 
 ## File Structure
 
-```
+```text
 tonal/
 ├── CLAUDE.md                    ← This file (project context)
 ├── manifest.json                ← Extension config
@@ -229,12 +230,14 @@ INPUT_DATA: {TEXT}
 ## UI Design Requirements (v4.0.0 - Elite Masterpiece)
 
 ### Injected Master Pill
+
 - **Inside Docking**: Anchored 10px from the right boundary of the text field.
 - **Perfect Roundness**: Hard-coded 100px radius enforced via Shadow DOM `:host` scoping.
 - **Bullet Logo**: Precise 1:1 SVG paths for Rest (13x8) and Expanded (11x7) states.
 - **Glassmorphism**: Popovers feature `backdrop-filter: blur(10px)` with 14px radius.
 
 ### Component Logic
+
 - **Rest State**: 30x16px pill. Click expands.
 - **Expanded State**: 24px height. Shows tone label + animated Chevron cross-fade.
 - **Toast System**: Green success dots for "Converted" or "Copied" feedback.
@@ -245,16 +248,19 @@ INPUT_DATA: {TEXT}
 ## Important Technical Constraints
 
 ### MV3 Service Worker Rules
+
 - `background.js` is a SERVICE WORKER — it cannot access the DOM
 - Service workers are stateless — use `chrome.storage`
 
 ### Content Script Injection (v4 Standards)
+
 - **Zero Drift**: All CSS is inlined in `tonal.js`. DO NOT use external CSS files for injected UI.
 - **Shadow DOM**: Every Tonal component MUST be wrapped in an isolated Shadow Root.
 - **Scoping**: All design tokens (variables) MUST be scoped to `:host` inside the Shadow Root.
 - **Docking**: Use a high-frequency `requestAnimationFrame` watchdog to maintain "Inside-the-Box" coordinates.
 
 ### Text Input Handling
+
 - Use `document.execCommand("insertText")` for `contenteditable` compatibility.
 - Always dispatch `input` and `change` events for React/Lexical synchronization.
 
@@ -326,6 +332,7 @@ Handle these specific cases gracefully:
 ---
 
 ## Testing Checklist (v2.1.0)
+
 - [ ] Verify "Copied!" green success state on Decode Card.
 - [ ] Verify Popover active state has no hover and black background.
 - [ ] Verify Popup has no "Position Offset" controls.

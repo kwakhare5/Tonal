@@ -50,6 +50,7 @@
     register(input) {
       const shadow = this.getShadow();
       const wrap = UI.h('div', { 
+        className: 't-wrap',
         style: 'position:absolute; pointer-events:auto; display:flex; align-items:center; justify-content:flex-end; width:200px; height:32px;' 
       });
       shadow.appendChild(wrap);
@@ -60,7 +61,9 @@
         state: 'rest', 
         tone: 'workChat', 
         popover: false,
-        originalText: '' 
+        originalText: '',
+        pill: null,
+        pop: null
       };
       this.registry.set(input, entry);
       this.render(input);
@@ -69,26 +72,41 @@
     render(input) {
       const e = this.registry.get(input);
       if (!e) return;
-      e.wrap.innerHTML = '';
 
-      const pill = UI.createPill(e.state, e.tone, {
-        onClick: () => {
-          if (e.state === 'rest') { e.state = 'expanded'; this.render(input); }
-          else if (e.state === 'expanded') this.convert(input);
-          else if (e.state === 'done') this.undo(input);
-        },
-        onTogglePopover: () => { e.popover = !e.popover; this.render(input); }
-      });
+      // 1. Create or Update Pill
+      if (!e.pill) {
+        e.pill = UI.createPill(e.state, e.tone, {
+          onClick: () => {
+            if (e.state === 'rest') { e.state = 'expanded'; this.render(input); }
+            else if (e.state === 'expanded') this.convert(input);
+            else if (e.state === 'done') this.undo(input);
+          },
+          onTogglePopover: () => { e.popover = !e.popover; this.render(input); }
+        });
+        e.wrap.appendChild(e.pill);
+      } else {
+        // Surgical update: classes only to preserve hover state
+        e.pill.className = `t-pill t-pill--${e.state}${e.popover ? ' t-pill--popover-open' : ''}`;
+        const label = e.pill.querySelector('.t-label');
+        if (label) {
+          if (e.state === 'loading') { label.className = 't-label dots'; label.textContent = 'Converting'; }
+          else if (e.state === 'done') { label.className = 't-label'; label.textContent = 'Undo'; }
+          else { label.className = 't-label'; label.textContent = (window.Tonal.TONES.find(t => t.id === e.tone) || {}).l || 'Work Chat'; }
+        }
+      }
 
-      if (e.popover) {
-        const pop = UI.createPopover(e.tone, (newTone) => {
+      // 2. Manage Popover
+      if (e.popover && !e.pop) {
+        e.pop = UI.createPopover(e.tone, (newTone) => {
           e.tone = newTone; e.popover = false; this.render(input);
         });
-        e.wrap.appendChild(pop);
-        requestAnimationFrame(() => pop.classList.add('popover--active'));
+        e.wrap.insertBefore(e.pop, e.pill);
+        requestAnimationFrame(() => e.pop.classList.add('popover--active'));
+      } else if (!e.popover && e.pop) {
+        e.pop.classList.remove('popover--active');
+        const p = e.pop; e.pop = null;
+        setTimeout(() => p.remove(), 200);
       }
-      
-      e.wrap.appendChild(pill);
     }
 
     async convert(input) {
