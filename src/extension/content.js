@@ -20,16 +20,7 @@
     ANIM_DURATION_MS: 300
   };
 
-  /**
-   * Returns a storage key based on the current platform.
-   */
-  function getPlatformKey() {
-    const url = window.location.href;
-    if (url.includes('slack.com')) return 'tonal_tone_slack';
-    if (url.includes('linkedin.com')) return 'tonal_tone_linkedin';
-    if (url.includes('mail.google.com')) return 'tonal_tone_gmail';
-    return 'defaultTone';
-  }
+  const TONE_KEY = 'defaultTone';
 
   class TonalInjector {
     constructor() {
@@ -53,15 +44,15 @@
       document.addEventListener('scroll', onSync, { passive: true, capture: true });
 
       chrome.storage.onChanged.addListener((changes) => {
-        const key = getPlatformKey();
-        if (changes[key]) {
+        if (changes[TONE_KEY]) {
           this.registry.forEach(entry => {
-            entry.tone = changes[key].newValue;
+            entry.tone = changes[TONE_KEY].newValue;
             this.render(entry.input);
           });
         }
       });
     }
+
 
     handleMagneticPull(e) {
       const targets = [];
@@ -278,9 +269,8 @@
       this.resizeObserver = this.resizeObserver || new ResizeObserver(() => this.requestPositionUpdate());
       this.resizeObserver.observe(input);
 
-      const key = getPlatformKey();
-      chrome.storage.sync.get(key, (res) => {
-        if (res[key]) entry.tone = res[key];
+      chrome.storage.sync.get(TONE_KEY, (res) => {
+        if (res[TONE_KEY]) entry.tone = res[TONE_KEY];
         this.render(input);
         this.requestPositionUpdate();
       });
