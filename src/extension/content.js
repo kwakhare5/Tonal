@@ -69,6 +69,17 @@
       const onSync = () => this.requestPositionUpdate();
       window.addEventListener('resize', onSync, { passive: true });
       document.addEventListener('scroll', onSync, { passive: true, capture: true });
+
+      // Live Sync: Update UI across tabs when settings change
+      chrome.storage.onChanged.addListener((changes) => {
+        const key = getPlatformKey();
+        if (changes[key]) {
+          this.registry.forEach(entry => {
+            entry.tone = changes[key].newValue;
+            this.render(entry.input);
+          });
+        }
+      });
     }
 
     /**
@@ -206,15 +217,29 @@
     /**
      * Communicates with background.js to call the AI Proxy.
      */
-    async callAI(text, mode, toneLevel = 'workChat') {
+    async callAI(text, mode, toneLevel = 'workChat', attempt = 1) {
+      const MAX_RETRIES = 3;
+      
       return new Promise((resolve, reject) => {
         if (!chrome.runtime?.id) return reject('Extension reloaded. Please refresh the page.');
+        
         chrome.runtime.sendMessage({
           type: mode === 'decode' ? "TONESHIFT_DECODE" : "TONESHIFT_CONVERT",
           text, toneLevel
         }, (res) => {
-          if (chrome.runtime.lastError || !res || !res.success) reject(res?.error || 'AI Offline');
-          else resolve(res.text);
+          if (chrome.runtime.lastError || !res || !res.success) {
+            // ELITE RETRY LOGIC: Silent recovery for transient blips
+            if (attempt < MAX_RETRIES) {
+              const delay = Math.pow(2, attempt) * 500; // 1s, 2s, 4s
+              setTimeout(() => {
+                this.callAI(text, mode, toneLevel, attempt + 1).then(resolve).catch(reject);
+              }, delay);
+            } else {
+              reject(res?.error || 'AI Offline');
+            }
+          } else {
+            resolve(res.text);
+          }
         });
       });
     }
@@ -531,7 +556,9 @@
       const currentText = entry.adapter.getValue(input);
       if (!currentText || currentText.length < 2) return UI.showToast(this.getShadow(), 'Type something first', 'error');
 
-      // SMARTER LOGIC: Always convert from the original draft to preserve quality
+      // Snapshot text before AI call to detect "Dirty State" (typing while loading)
+      const textAtStart = currentText;
+      
       if (entry.state !== 'done') {
         entry.originalText = currentText;
       }
@@ -541,7 +568,18 @@
       this.render(input);
 
       try {
-        const res = await this.callAI(sourceText, 'convert', entry.tone);
+        let res = await this.callAI(sourceText, 'convert', entry.tone);
+        res = (res || "").trim(); // AI Sanitization
+        
+        // Final Dirty Check: Did the user type something new while we were waiting?
+        const textAtEnd = entry.adapter.getValue(input);
+        if (textAtEnd !== textAtStart) {
+          UI.showToast(this.getShadow(), 'Draft changed. Re-click to update.', 'error');
+          entry.state = 'rest';
+          this.render(input);
+          return;
+        }
+
         entry.adapter.insertText(input, res, input.isContentEditable);
         entry.state = 'done';
         UI.showToast(this.getShadow(), 'Converted');
@@ -578,25 +616,45 @@
     }
 
     updatePositions() {
-      for (const [input, entry] of this.registry.entries()) {
+      this.registry.forEach((entry, input) => {
         if (!input.isConnected) {
           entry.wrap.remove();
           this.registry.delete(input);
-          continue;
+          return;
         }
 
         const rect = input.getBoundingClientRect();
-        if (rect.width === 0) continue;
+        if (rect.width === 0 || rect.height === 0) {
+          entry.wrap.style.display = 'none';
+          return;
+        }
 
-        const safeRect = this.getSafeRect(rect);
-        const off = entry.adapter.getOffsets(input);
+        entry.wrap.style.display = 'block';
+        const safe = this.getSafeRect(rect);
+        const offsets = entry.adapter.getOffsets ? entry.adapter.getOffsets(input) : { x: 8, y: 8 };
+        
+        // Grammarly Collision Detection
+        const collisionOffset = this.checkCollision(input);
+        
+        entry.wrap.style.left = `${safe.left + safe.width - offsets.x - collisionOffset}px`;
+        entry.wrap.style.top = `${safe.top + safe.height - offsets.y}px`;
+      });
+    }
 
-        // Auto-center in single-line inputs
-        const yOff = rect.height < 60 ? (rect.height - 32) / 2 : off.y;
-
-        entry.wrap.style.top = `${safeRect.top + safeRect.height - yOff}px`;
-        entry.wrap.style.left = `${safeRect.left + safeRect.width - off.x}px`;
-      }
+    /**
+     * Detects external UI elements (like Grammarly) to avoid overlapping.
+     */
+    checkCollision(input) {
+      // Common Grammarly selectors or floating widgets
+      const grammarly = document.querySelector('grammarly-extension-element, [data-grammarly-part="button"]');
+      if (!grammarly) return 0;
+      
+      const gRect = grammarly.getBoundingClientRect();
+      const iRect = input.getBoundingClientRect();
+      
+      // If Grammarly button is near the bottom right of our input
+      const isNear = (gRect.right > iRect.right - 40) && (gRect.bottom > iRect.bottom - 40);
+      return isNear ? 32 : 0; // Shift Tonal left by 32px if Grammarly is there
     }
   }
 
