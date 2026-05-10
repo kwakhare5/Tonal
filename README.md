@@ -1,4 +1,4 @@
-# Tonal Chrome Extension — V4.8.0
+# Tonal Chrome Extension — V5.5.0
 
 Tonal is an "Elite" AI-powered rephrasing engine that shifts the tone of your messages across LinkedIn, Gmail, Slack, and WhatsApp with 1:1 Design System parity.
 

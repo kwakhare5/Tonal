@@ -1,36 +1,71 @@
+/**
+ * Tonal LinkedIn Adapter
+ * Handles: Main Chat, Feed Comments, InMail
+ */
+
 window.TonalAdapters = window.TonalAdapters || {};
 
 window.TonalAdapters.linkedin = {
+  id: 'linkedin',
+  
   matches: (url) => url.includes('linkedin.com'),
-  insertText: (container, text, isRichText = false) => {
-    // 1. Locate the actual Draft.js editor node
-    const input = container.getAttribute('contenteditable') === 'true' 
-      ? container 
-      : container.querySelector('[contenteditable="true"]');
-      
-    if (!input) return;
-    input.focus();
 
-    // 2. Draft.js absolutely requires a hard native selection clear
-    const range = document.createRange();
-    range.selectNodeContents(input);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
+  selectors: [
+    '.msg-form__contenteditable', // Main Chat
+    '.comments-comment-box__content-editable', // Feed Comments
+    '.feed-shared-update-v2__comment-box [contenteditable="true"]', // Alternative Feed Comments
+    '.msg-form__textarea' // Fallback for some InMail variations
+  ],
 
-    // 3. Draft.js prefers native insertText over synthetic paste
+  isValid(el) {
+    const label = (el.getAttribute('aria-label') || el.placeholder || '').toLowerCase();
+    const role = (el.getAttribute('role') || '').toLowerCase();
+    if (label.includes('search') || label.includes('filter') || role === 'combobox') return false;
+    return (label.includes('message') || label.includes('comment') || label.includes('reply') || label.includes('write')) && el.offsetHeight > 30;
+  },
+
+  getOffsets(el) {
+    return { x: 8, y: 8 };
+  },
+
+  getValue(el) {
+    return (el.innerText || el.textContent || "").trim();
+  },
+
+  insertText(el, text, isRichText = false) {
+    el.focus();
+    const selection = window.getSelection();
+    let offset = 0;
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      offset = range.startOffset;
+    }
+
+    document.execCommand('selectAll', false, null);
+    document.execCommand('insertText', false, text);
+    
+    // LinkedIn specific: trigger an input event for React
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // Cursor Anchor: Force restore position after React render
     setTimeout(() => {
-      const success = document.execCommand('insertText', false, text);
-      
-      if (!success) {
-        // Fallback for strict browser states
-        const dt = new DataTransfer();
-        dt.setData('text/plain', text);
-        input.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+      el.focus();
+      try {
+        const newRange = document.createRange();
+        const textNode = el.firstChild || el;
+        const finalPos = Math.min(offset, (textNode.length || textNode.textContent?.length || 0));
+        newRange.setStart(textNode, finalPos);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+      } catch (e) {
+        // Fallback to end of text if node structure changed
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
-      
-      // 4. Force React/Draft.js to sync the updated DOM to its internal state
-      input.dispatchEvent(new Event('input', { bubbles: true }));
     }, 10);
   }
 };

@@ -1,24 +1,45 @@
+/**
+ * Tonal Default Adapter
+ * Fallback for unknown platforms or general testing
+ */
+
 window.TonalAdapters = window.TonalAdapters || {};
 
 window.TonalAdapters.default = {
-  matches: () => true,
-  insertText: (input, text, isRichText = false) => {
-    input.focus();
-    document.execCommand('selectAll', false, null);
-    
-    const dataTransfer = new DataTransfer();
-    dataTransfer.setData('text/plain', text);
-    if (isRichText) dataTransfer.setData('text/html', text);
-    
-    const pasteEvent = new ClipboardEvent('paste', {
-      clipboardData: dataTransfer,
-      bubbles: true,
-      cancelable: true
-    });
-    input.dispatchEvent(pasteEvent);
+  id: 'default',
+  
+  matches: () => true, // Always matches as fallback
 
-    if (!pasteEvent.defaultPrevented) {
+  selectors: [
+    '[contenteditable="true"]',
+    'textarea'
+  ],
+
+  isValid(el) {
+    // Basic heuristic: not a search bar and tall enough
+    const text = (el.getAttribute('aria-label') || el.placeholder || el.id || '').toLowerCase();
+    const isSearch = text.includes('search') || text.includes('query');
+    return !isSearch && el.offsetHeight > 30;
+  },
+
+  getOffsets(el) {
+    return { x: 8, y: 8 };
+  },
+
+  getValue(el) {
+    if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') return el.value || "";
+    return (el.innerText || el.textContent || "").trim();
+  },
+
+  insertText(input, text, isRichText = false) {
+    input.focus();
+    if (input.tagName === 'TEXTAREA' || input.tagName === 'INPUT') {
+      input.value = text;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    } else {
+      document.execCommand('selectAll', false, null);
       document.execCommand('insertText', false, text);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
     }
   }
 };

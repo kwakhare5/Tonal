@@ -9,7 +9,7 @@
     "https://*.slack.com/*",
     "https://*.whatsapp.com/*",
     "https://*.linkedin.com/*",
-    "https://*.workers.dev/*"
+    "https://tonal-proxy.kwakhare5.workers.dev/*"
   ],
   "background": {
     "service_worker": "src/extension/background.js"
@@ -27,6 +27,7 @@
         "src/extension/adapters/linkedin.js",
         "src/extension/adapters/slack.js",
         "src/extension/adapters/gmail.js",
+        "src/extension/adapters/sandbox.js",
         "src/extension/adapters/default.js",
         "src/extension/adapters/manager.js",
         "src/core/tonal.js",

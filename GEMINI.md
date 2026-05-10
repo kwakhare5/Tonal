@@ -1,4 +1,4 @@
-# CLAUDE.md — Agent Rules + Project Context
+# GEMINI.md — Agent Rules + Project Context
 
 ## Overview
 
@@ -34,6 +34,13 @@ Format: Goal / Approach / Steps / Risks
 **R5 — LIVING DOCUMENTS**
 Before ending any session: update task.md + walkthrough.md. Both. No skipping.
 task.md = what. walkthrough.md = why.
+
+**R6 — SANDBOX PARITY (Laboratory v4)**
+`dev/sandbox.html` MUST remain a 1:1 mirror of the extension engine.
+
+- No "Sandbox-Only" logic allowed.
+- All core files (`tonal.js`, `content.js`, `adapters/`) must be loaded and functional in the lab.
+- Any UI or Logic change must be verified in the sandbox BEFORE platform testing.
 
 **R13 — CONTEXT TRUNCATION**
 If chat is long: re-read this file immediately.

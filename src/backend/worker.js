@@ -1,71 +1,95 @@
 // worker.js — Tonal API Proxy
 // ─────────────────────────────────────────────────────────────
-// DEPLOY THIS TO CLOUDFLARE WORKERS (not part of the extension)
-//
-// Steps:
-// 1. Go to workers.cloudflare.com → sign up free
-// 2. Create Worker → delete default code → paste this
-// 3. Click "Save and Deploy"
-// 4. Go to Settings → Variables → Add variable:
-// The AI runs natively on Cloudflare (no API keys needed).
+// DEPLOY THIS TO CLOUDFLARE WORKERS
 // ─────────────────────────────────────────────────────────────
 
+const SYSTEM_LOGIC = `
+You are the Tonal Engine. Your sole purpose is to rewrite text while preserving 100% of the meaning and facts.
+
+CORE RULES:
+1. IDENTITY & DATA LOCK: Names (e.g., "Ravi", "Sarah"), numbers, dates, times, links, email addresses, and amounts are IMMUTABLE. Never change, paraphrase, or omit them.
+2. MINIMAL INTERVENTION: Only change parts of the text that require a tone shift. Keep greetings (e.g., "Hello Ravi"), sign-offs, and neutral statements exactly as they are.
+3. CASING LOCK: Preserve the original casing of the input. If it is lowercase, keep it lowercase. If it is ALL CAPS, keep it ALL CAPS.
+4. Correct spelling mistakes silently.
+5. Do not add filler or corporate words that were not in the original.
+6. Same length as the original — do not pad.`;
+
 const PROMPTS = {
-  casual: `IDENTITY: Expert Linguistic Chameleon.
-TASK: Transform text into "Casual" (Messaging) tone.
+  casual: `You are a tone converter. Rewrite the message below in a casual texting style.
+${SYSTEM_LOGIC}
 
-CONSTRAINTS:
-- TARGET: Lowercase-friendly, short-form (u, r, sry), relaxed grammar.
-- PRESERVE: Meaning, urgency, specific nouns.
-- FORBIDDEN: Preamble, sympathetic replies, robotic formalisms, quotation marks.
-- RESULT_ONLY: Return only the transformed text.
-
-EXAMPLES:
-- Input: "I apologize for the delay." -> Output: "sry for the delay"
-- Input: "Please send the file." -> Output: "can u send the file?"
-
-INPUT: {TEXT}`,
-
-  workChat: `IDENTITY: Professional Communication Architect.
-TASK: Transform text into "Work Chat" (Slack/Teams) tone.
-
-CONSTRAINTS:
-- TARGET: Professional, concise, polite but efficient.
-- PRESERVE: All technical details and intent.
-- FORBIDDEN: Greetings (Hi/Hey), Preamble, sympathetic replies, robotic formalisms.
-- RESULT_ONLY: Return only the transformed text.
+TONE FINGERPRINT (CASUAL):
+- Keep the format of the text same (Casing Lock).
+- Minimal punctuation, no full stop at end.
+- ONLY use contractions/abbreviations (u, ur, gonna, wanna, bc, lmk, rn) if the original text already implies a casual vibe.
+- Short, sometimes incomplete sentences.
+- Questions without question marks sometimes.
 
 EXAMPLES:
-- Input: "hey i cant make it sry" -> Output: "I won't be able to make it today, sorry about that."
-- Input: "send me the doc" -> Output: "Could you please send over that document when you have a chance?"
+INPUT: Could you please send me the Q3 report at your earliest convenience?
+OUTPUT: can u send me the Q3 report
 
-INPUT: {TEXT}`,
+INPUT: I will be approximately 10 minutes delayed. I apologize for the inconvenience.
+OUTPUT: gonna be 10 min late sry
 
-  formal: `IDENTITY: Executive Communications Specialist.
-TASK: Transform text into "Formal" (Business/Legal) tone.
+Now rewrite this message. Output ONLY the rewritten message, nothing else.`,
 
-CONSTRAINTS:
-- TARGET: Formal, sophisticated, full grammar, polite.
-- PRESERVE: Professional distance and core intent.
-- FORBIDDEN: Preamble, "Dear [Name]", sympathetic replies, conversational filler.
-- RESULT_ONLY: Return only the transformed text.
+  workChat: `You are a tone converter. Rewrite the message below in a Work Chat tone.
+${SYSTEM_LOGIC}
+
+TONE FINGERPRINT (WORK CHAT):
+- Sentence case — capitalize first word and proper nouns.
+- Contractions are fine: I'll, can't, won't, let's, I've, you're.
+- Friendly but direct — no warmup fluff.
+- No buzzwords: not "circle back", "synergize", "leverage", "deliverables", "bandwidth".
+- Question marks always, exclamations sparingly.
 
 EXAMPLES:
-- Input: "hey im late" -> Output: "Please accept my apologies for the delay in my arrival."
-- Input: "can u help?" -> Output: "I would appreciate your assistance with this matter."
+INPUT: hey cn u send me teh Q3 reprt asap
+OUTPUT: Can you send me the Q3 report ASAP?
 
-INPUT: {TEXT}`,
+INPUT: gonna be 10 min late sry
+OUTPUT: I'll be about 10 minutes late, sorry.
 
-  decode: `IDENTITY: Corporate Jargon Decoder.
-TASK: Translate corporate speak into a direct "Decoded Message".
+Now rewrite this message. Output ONLY the rewritten message, nothing else.`,
 
-CONSTRAINTS:
-- TARGET: Direct, clear, simple language only.
-- PRESERVE: The core message and intent.
-- FORBIDDEN: Preamble, corporate fluff, sympathetic tone, additional context.
-- RESULT_ONLY: Return only the decoded text.
+  formal: `You are a tone converter. Rewrite the message below in a formal professional tone.
+${SYSTEM_LOGIC}
 
-INPUT: {TEXT}`,
+TONE FINGERPRINT (FORMAL):
+- Full sentences, ends with period always.
+- No contractions: "I will" not "I'll", "cannot" not "can't", "do not" not "don't".
+- Polite structure: "Could you please", "I would appreciate", "I would like to".
+- No slang or abbreviations.
+
+EXAMPLES:
+INPUT: hey cn u send me teh Q3 reprt
+OUTPUT: Could you please send me the Q3 report?
+
+INPUT: gonna be 10 min late sry
+OUTPUT: I regret to inform you that I will be approximately 10 minutes delayed. I apologize for the inconvenience.
+
+Now rewrite this message. Output ONLY the rewritten message, nothing else.`,
+
+  decode: `You are a decoder for formal and corporate language.
+Tell me in plain, simple words what this message actually means or is asking for.
+
+Hard rules:
+- Preserve ALL specific information: numbers, names, dates, amounts, deadlines. Never omit these.
+- 1–2 sentences maximum.
+- Use simple everyday words.
+- If it is a request, say clearly what they are asking for.
+- If it is bad news, say it plainly.
+- Do not use formal words yourself in the explanation.
+
+EXAMPLES:
+INPUT: After due consideration, the committee has determined that the proposed budget allocation is not aligned with current organizational priorities.
+OUTPUT: Your budget request was rejected.
+
+INPUT: I am following up on my previous correspondence and would appreciate an update at your earliest convenience.
+OUTPUT: They want an update — respond to their earlier message.
+
+Now decode this message. Output ONLY the plain English explanation, nothing else.`,
 };
 
 const CORS_HEADERS = {
@@ -76,90 +100,63 @@ const CORS_HEADERS = {
 
 export default {
   async fetch(request, environment) {
-    if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: CORS_HEADERS });
-    }
-
-    if (request.method !== "POST") {
-      return json({ success: false, error: "Method not allowed" }, 405);
-    }
+    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS_HEADERS });
+    if (request.method !== "POST") return json({ success: false, error: "Method not allowed" }, 405);
 
     let body;
-    try {
-      body = await request.json();
-    } catch {
-      return json({ success: false, error: "Invalid JSON body" }, 400);
-    }
+    try { body = await request.json(); } catch { return json({ success: false, error: "Invalid JSON" }, 400); }
 
-    const { text, toneLevel, mode } = body;
-
-    // 1. Input Validation & Sanitization
-    if (!text || typeof text !== "string" || text.trim().length < 2) {
-      return json({ success: false, error: "Input text is too short or invalid" }, 400);
-    }
+    const { text, toneLevel, mode, platform } = body;
+    if (!text || typeof text !== "string" || text.trim().length < 2) return json({ success: false, error: "Text too short" }, 400);
 
     const promptKey = mode === "decode" ? "decode" : (toneLevel || "workChat");
-    const systemPrompt = PROMPTS[promptKey] || PROMPTS.workChat;
+    let systemPrompt = PROMPTS[promptKey] || PROMPTS.workChat;
 
-    const payload_base = {
+    // Inject Platform Context
+    if (platform && mode !== "decode") {
+      const contextMap = {
+        slack: "PLATFORM: Slack (Internal Team Chat). Keep it brief, direct, and conversational. No email-style greetings or sign-offs unless present in original.",
+        whatsapp: "PLATFORM: WhatsApp (Instant Messaging). Be concise and informal. Avoid corporate fluff.",
+        gmail: "PLATFORM: Gmail (Email). Use professional sentence structure. Maintain standard email courtesy.",
+        linkedin: "PLATFORM: LinkedIn (Professional Networking). Be professional and polished. Respect InMail norms."
+      };
+      const context = contextMap[platform] || "PLATFORM: General Web Input.";
+      systemPrompt = `${systemPrompt}\n\n${context}`;
+    }
+
+    const payload = {
       model: "llama-3.3-70b-versatile",
       messages: [
-        {
-          role: "system",
-          content: `${systemPrompt}\n\nCRITICAL: You MUST change the tone. Do not return the original text. Return ONLY JSON: { "text": "...", "confidence": 1.0 }`
-        },
-        { role: "user", content: text.trim() }
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `INPUT: ${text.trim()}` }
       ],
-      temperature: 0.3,
-      max_tokens: 1000,
-      response_format: { type: "json_object" }
+      temperature: 0.1, 
+      max_tokens: 1000
     };
 
-    // 1. Primary: Groq API
     if (environment.GROQ_API_KEY) {
       try {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
-          headers: {
-            "Authorization": `Bearer ${environment.GROQ_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload_base),
+          headers: { "Authorization": `Bearer ${environment.GROQ_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
         });
-
         if (response.ok) {
           const data = await response.json();
-          const content = data.choices?.[0]?.message?.content;
-          if (content) {
-            const result = JSON.parse(content);
-            if (result.text) {
-              return json({ success: true, text: result.text.trim(), provider: "groq" });
-            }
-          }
+          let rawText = data.choices?.[0]?.message?.content?.trim() || "";
+          
+          // Smart Preamble Stripper
+          const cleanText = rawText
+            .replace(/^(here is|sure|certainly|revised|converted|output|rewritten|message|result|the|this)[\s\S]*?[:\n]+/i, "") // Strip headers
+            .replace(/^["']|["']$/g, "") // Strip accidental quotes
+            .trim();
+            
+          return json({ success: true, text: cleanText || rawText, provider: "groq" });
         }
       } catch (e) { console.error("Groq Failed:", e); }
     }
 
-    // 2. Fallback: Cloudflare Workers AI
-    if (environment.AI) {
-      try {
-        const cfResponse = await environment.AI.run("@cf/meta/llama-3-8b-instruct", {
-          messages: [
-            { 
-              role: "system", 
-              content: `${systemPrompt}\n\nCRITICAL: You MUST change the tone. Do not return the original text. Be brief and direct.`
-            },
-            { role: "user", content: text.trim() }
-          ]
-        });
-        if (cfResponse && cfResponse.response) {
-          const cleanText = cfResponse.response.replace(/\{"text":\s*"/, "").replace(/"\}/, "").trim();
-          return json({ success: true, text: cleanText, provider: "cf-native" });
-        }
-      } catch (e) { console.error("CF AI Failed:", e); }
-    }
-
-    return json({ success: false, error: "AI Providers failed or returned identical text" }, 502);
+    return json({ success: false, error: "AI Pipeline failed" }, 502);
   },
 };
 

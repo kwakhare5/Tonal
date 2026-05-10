@@ -1,48 +1,45 @@
-/* popup.js — Tonal v2.1.0 */
-
 document.addEventListener('DOMContentLoaded', () => {
   const toneItems = document.querySelectorAll('.seg-item');
-  const saveBtn = document.getElementById('save-btn');
+  const saveBtn = document.getElementById('saveBtn');
+  let selectedTone = 'workChat';
 
-  const defaultSettings = { defaultTone: 'workChat' };
-
-  // Load saved settings
-  chrome.storage.sync.get(defaultSettings, (settings) => {
-    updateDisplay(settings.defaultTone);
+  // Load saved preference
+  chrome.storage.sync.get({ defaultTone: 'workChat' }, (result) => {
+    selectedTone = result.defaultTone;
+    updateUI();
   });
 
-  // Update UI
-  function updateDisplay(activeTone) {
-    toneItems.forEach(i => {
-      i.classList.toggle('seg-item--active', i.dataset.tone === activeTone);
-    });
-  }
-
-  // Tone Selection
   toneItems.forEach(item => {
-    item.onclick = () => {
-      const activeTone = item.dataset.tone;
-      updateDisplay(activeTone);
-      saveBtn.dataset.pendingTone = activeTone;
-    };
+    item.addEventListener('click', () => {
+      selectedTone = item.dataset.tone;
+      updateUI();
+    });
   });
 
-  // Save Logic
-  saveBtn.onclick = () => {
-    const toneToSave = saveBtn.dataset.pendingTone || 'workChat';
-    
-    chrome.storage.sync.set({ defaultTone: toneToSave }, () => {
-      // Visual Feedback
+  saveBtn.addEventListener('click', () => {
+    chrome.storage.sync.set({ defaultTone: selectedTone }, () => {
       const originalText = saveBtn.textContent;
-      saveBtn.textContent = "Saved!";
-      saveBtn.style.background = "#34C759"; // Literal Green
-      saveBtn.style.color = "#FFFFFF";
+      const originalBg = saveBtn.style.background;
+      
+      saveBtn.textContent = 'Saved!';
+      saveBtn.style.background = '#34C759';
+      saveBtn.style.pointerEvents = 'none';
       
       setTimeout(() => {
         saveBtn.textContent = originalText;
-        saveBtn.style.background = "";
-        saveBtn.style.color = "";
+        saveBtn.style.background = originalBg;
+        saveBtn.style.pointerEvents = 'auto';
       }, 1500);
     });
-  };
+  });
+
+  function updateUI() {
+    toneItems.forEach(item => {
+      if (item.dataset.tone === selectedTone) {
+        item.classList.add('seg-item--active');
+      } else {
+        item.classList.remove('seg-item--active');
+      }
+    });
+  }
 });
